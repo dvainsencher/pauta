@@ -34,4 +34,8 @@ describe("setStatus", () => {
   it("throws for a nonexistent id", () => {
     expect(() => setStatus(cwd, 999, "done")).toThrow(/999/);
   });
+
+  it("rejects an invalid status", () => {
+    expect(() => setStatus(cwd, id, "bogus")).toThrow(/bogus/);
+  });
 });

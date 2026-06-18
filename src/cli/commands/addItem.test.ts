@@ -41,6 +41,10 @@ describe("addItem", () => {
     expect(() => addItem(cwd, "Dark mode", { sprint: "missing" })).toThrow(/missing/);
   });
 
+  it("rejects an invalid status", () => {
+    expect(() => addItem(cwd, "Dark mode", { status: "bogus" })).toThrow(/bogus/);
+  });
+
   it("allocates increasing ids", () => {
     addItem(cwd, "first");
     const second = addItem(cwd, "second");

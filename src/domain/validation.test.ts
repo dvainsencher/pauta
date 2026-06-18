@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { Item, Sprint } from "./types.js";
-import { assertItemExists, assertSprintExists, assertSprintNameAvailable } from "./validation.js";
+import {
+  assertItemExists,
+  assertItemStatus,
+  assertSprintExists,
+  assertSprintNameAvailable,
+  assertSprintStatus,
+} from "./validation.js";
 
 function sprint(name: string): Sprint {
   return { name, position: 10, status: "planned", goal: "", notes: "" };
@@ -46,5 +52,25 @@ describe("assertItemExists", () => {
 
   it("throws when the item does not exist", () => {
     expect(() => assertItemExists([item(1)], 999)).toThrow(/999/);
+  });
+});
+
+describe("assertItemStatus", () => {
+  it("does not throw for a valid status", () => {
+    expect(() => assertItemStatus("doing")).not.toThrow();
+  });
+
+  it("throws for an invalid status", () => {
+    expect(() => assertItemStatus("bogus")).toThrow(/bogus/);
+  });
+});
+
+describe("assertSprintStatus", () => {
+  it("does not throw for a valid status", () => {
+    expect(() => assertSprintStatus("active")).not.toThrow();
+  });
+
+  it("throws for an invalid status", () => {
+    expect(() => assertSprintStatus("bogus")).toThrow(/bogus/);
   });
 });

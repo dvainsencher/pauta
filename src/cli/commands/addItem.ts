@@ -1,11 +1,11 @@
 import type { Item, ItemStatus } from "../../domain/types.js";
 import { nextId } from "../../domain/ids.js";
-import { assertSprintExists } from "../../domain/validation.js";
+import { assertItemStatus, assertSprintExists } from "../../domain/validation.js";
 import { readItems, writeItems } from "../../storage/itemsStore.js";
 import { readSprints } from "../../storage/sprintsStore.js";
 
 export interface AddItemOptions {
-  status?: ItemStatus;
+  status?: string;
   sprint?: string;
 }
 
@@ -14,6 +14,9 @@ export function addItem(cwd: string, title: string, options: AddItemOptions = {}
   if (sprint !== "") {
     assertSprintExists(readSprints(cwd), sprint);
   }
+  if (options.status !== undefined) {
+    assertItemStatus(options.status);
+  }
 
   const items = readItems(cwd);
   const id = nextId(items);
@@ -21,7 +24,7 @@ export function addItem(cwd: string, title: string, options: AddItemOptions = {}
   const item: Item = {
     id,
     title,
-    status: options.status ?? "idea",
+    status: (options.status as ItemStatus | undefined) ?? "idea",
     sprint,
     createdAt: now,
     updatedAt: now,

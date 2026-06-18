@@ -28,4 +28,8 @@ describe("setSprintStatus", () => {
   it("throws for a nonexistent sprint", () => {
     expect(() => setSprintStatus(cwd, "missing", "done")).toThrow(/missing/);
   });
+
+  it("rejects an invalid status", () => {
+    expect(() => setSprintStatus(cwd, "foundation", "bogus")).toThrow(/bogus/);
+  });
 });

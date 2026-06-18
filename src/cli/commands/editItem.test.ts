@@ -41,4 +41,8 @@ describe("editItem", () => {
   it("throws for a nonexistent id", () => {
     expect(() => editItem(cwd, 999, { title: "x" })).toThrow(/999/);
   });
+
+  it("rejects an invalid status", () => {
+    expect(() => editItem(cwd, id, { status: "bogus" })).toThrow(/bogus/);
+  });
 });

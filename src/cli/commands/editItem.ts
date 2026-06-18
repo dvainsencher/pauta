@@ -1,15 +1,18 @@
 import type { ItemStatus } from "../../domain/types.js";
-import { assertItemExists } from "../../domain/validation.js";
+import { assertItemExists, assertItemStatus } from "../../domain/validation.js";
 import { readItems, writeItems } from "../../storage/itemsStore.js";
 
 export interface EditItemOptions {
   title?: string;
-  status?: ItemStatus;
+  status?: string;
 }
 
 export function editItem(cwd: string, id: number, options: EditItemOptions): void {
   const items = readItems(cwd);
   assertItemExists(items, id);
+  if (options.status !== undefined) {
+    assertItemStatus(options.status);
+  }
 
   const now = new Date().toISOString();
   const updated = items.map((item) =>
@@ -17,7 +20,7 @@ export function editItem(cwd: string, id: number, options: EditItemOptions): voi
       ? {
           ...item,
           title: options.title ?? item.title,
-          status: options.status ?? item.status,
+          status: (options.status as ItemStatus | undefined) ?? item.status,
           updatedAt: now,
         }
       : item,

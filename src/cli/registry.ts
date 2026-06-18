@@ -1,4 +1,3 @@
-import type { ItemStatus, SprintStatus } from "../domain/types.js";
 import { addItem } from "./commands/addItem.js";
 import { createSprint } from "./commands/createSprint.js";
 import { editItem } from "./commands/editItem.js";
@@ -24,7 +23,7 @@ export const commands: Record<string, CommandHandler> = {
     const parsed = parseArgs(args);
     const title = requirePositional(parsed, 0, "title");
     const id = addItem(cwd, title, {
-      status: parsed.flags.status as ItemStatus | undefined,
+      status: parsed.flags.status as string | undefined,
       sprint: parsed.flags.sprint as string | undefined,
     });
     return String(id);
@@ -35,7 +34,7 @@ export const commands: Record<string, CommandHandler> = {
     const id = requireIntPositional(parsed, 0, "id");
     editItem(cwd, id, {
       title: parsed.flags.title as string | undefined,
-      status: parsed.flags.status as ItemStatus | undefined,
+      status: parsed.flags.status as string | undefined,
     });
   },
 
@@ -78,14 +77,14 @@ export const commands: Record<string, CommandHandler> = {
   "set-status": (cwd, args) => {
     const parsed = parseArgs(args);
     const id = requireIntPositional(parsed, 0, "id");
-    const status = requirePositional(parsed, 1, "status") as ItemStatus;
+    const status = requirePositional(parsed, 1, "status");
     setStatus(cwd, id, status);
   },
 
   "set-sprint-status": (cwd, args) => {
     const parsed = parseArgs(args);
     const name = requirePositional(parsed, 0, "name");
-    const status = requirePositional(parsed, 1, "status") as SprintStatus;
+    const status = requirePositional(parsed, 1, "status");
     setSprintStatus(cwd, name, status);
   },
 
