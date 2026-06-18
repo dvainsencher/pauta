@@ -8,9 +8,11 @@ import { removeItem } from "./commands/removeItem.js";
 import { setActive } from "./commands/setActive.js";
 import { setPosition } from "./commands/setPosition.js";
 import { setSprintStatus } from "./commands/setSprintStatus.js";
+import { installSkills } from "./commands/installSkills.js";
 import { setStatus } from "./commands/setStatus.js";
 import { show } from "./commands/show.js";
 import { spec } from "./commands/spec.js";
+import { skillsSourceDir } from "../packageRoot.js";
 import { parseArgs, requireIntPositional, requirePositional } from "./parse.js";
 
 export type CommandHandler = (cwd: string, args: string[]) => string | void;
@@ -115,5 +117,10 @@ export const commands: Record<string, CommandHandler> = {
       done: parsed.flags.done === true,
       json: parsed.flags.json === true,
     });
+  },
+
+  "install-skills": (cwd) => {
+    const installed = installSkills(cwd, skillsSourceDir());
+    return installed.join("\n");
   },
 };

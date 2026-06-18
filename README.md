@@ -117,9 +117,11 @@ pauta set-active <name>                    # mark which sprint you're working on
 pauta set-sprint-status <name> <planned|active|done>
 
 pauta spec <id>                            # create/return path to specs/<id>.md
+
+pauta install-skills                       # copy the Claude Code skill files into .claude/skills/
 ```
 
-All of the above are implemented (`SPRINTS.md`'s `foundation` sprint).
+All of the above are implemented (`SPRINTS.md`'s `foundation` and `agent-skills` sprints).
 
 ### Reader (the linchpin — rich enough that the agent never opens raw files)
 
@@ -186,23 +188,46 @@ An external inspector agent (looking at a project you're *not* actively coding i
 
 ## Install & setup
 
-Two things get installed into a project: the **CLI** (so `pauta` runs) and the **Claude Code skills** (so the agent can drive it). Then `init` scaffolds the data directory.
+pauta isn't published to a registry yet, so a project depends on it as a
+`devDependency` pointed at this repo (git URL or a local path), the same way you'd
+depend on any unpublished package:
+
+```jsonc
+// package.json
+{
+  "devDependencies": {
+    "pauta": "git+https://github.com/dvainsencher/pauta.git"
+    // or, for local development: "pauta": "file:../pauta"
+  }
+}
+```
 
 ```
-# 1. get the CLI (script on PATH, or repo-local) — see install docs
-# 2. install the skill files into the project's Claude Code skills location
-# 3. scaffold the data dir
-pauta init
+npm install                # wires up node_modules/.bin/pauta
+npx pauta init              # scaffold docs/roadmap/ (empty items, sprints, specs/)
+npx pauta install-skills    # copy the Claude Code skill files into .claude/skills/
 ```
 
-**Existing project:** `init`, then `pauta bootstrap` to read the code and propose a starting plan.
-**New project:** `init`, then optionally `bootstrap` from docs alone (or start empty and add items by hand).
+`install-skills` is mechanical (no LLM) — it copies `pauta-add-item` and
+`pauta-reorganize` from the installed package's own `skills/` directory into the
+project's `.claude/skills/`, overwriting on re-run. Once installed, the skills
+themselves enforce the one rule: read via `pauta show --json`, write only via
+`pauta` commands, never touch `docs/roadmap/*` directly.
 
-`init` and the CLI are mechanical (no LLM); only `bootstrap` reads content and costs tokens.
+**Existing project:** `init`, then `install-skills`, then add items by hand (or via
+the `pauta-add-item` skill during a feature discussion) until `bootstrap` — which
+reads your existing code to propose a starting plan — ships in a future sprint
+(see `SPRINTS.md`'s `smart-ops` sprint; not built yet).
+**New project:** same — `init`, `install-skills`, start empty or add items as ideas
+come up.
+
+`init`, the CLI, and `install-skills` are all mechanical (no LLM); only `bootstrap`
+(future) reads content and costs tokens.
 
 ---
 
 ## Status
 
-`foundation` and `the-reader` sprints are done — the whole mechanical layer plus
-`show`/`show --json`. See `SPRINTS.md` for the build plan and what's next.
+`foundation`, `the-reader`, and `agent-skills` sprints are done — the whole
+mechanical layer, `show`/`show --json`, and the Claude Code skills that drive it.
+See `SPRINTS.md` for the build plan and what's next.
