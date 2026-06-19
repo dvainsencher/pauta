@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { specFilePath } from "../../storage/paths.js";
-import { addItem } from "./addItem.js";
+import { addIssue } from "./addIssue.js";
 import { init } from "./init.js";
 import { spec } from "./spec.js";
 
@@ -14,7 +14,7 @@ describe("spec", () => {
   beforeEach(() => {
     cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
     init(cwd);
-    id = addItem(cwd, "Dark mode");
+    id = addIssue(cwd, "Dark mode");
   });
 
   afterEach(() => {
@@ -34,7 +34,7 @@ describe("spec", () => {
     expect(fs.readFileSync(specFilePath(cwd, id), "utf8")).toBe("custom content\n");
   });
 
-  it("throws for a nonexistent item", () => {
+  it("throws for a nonexistent issue", () => {
     expect(() => spec(cwd, 999)).toThrow(/999/);
   });
 });

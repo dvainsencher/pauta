@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { readItems } from "../storage/itemsStore.js";
+import { readIssues } from "../storage/issuesStore.js";
 import { readSprints } from "../storage/sprintsStore.js";
 import { commands } from "./registry.js";
 
@@ -19,30 +19,30 @@ describe("command registry", () => {
 
   it("init scaffolds the roadmap dir", () => {
     commands.init(cwd, []);
-    expect(readItems(cwd)).toEqual([]);
+    expect(readIssues(cwd)).toEqual([]);
     expect(readSprints(cwd)).toEqual([]);
   });
 
-  it("add-item returns the new id as a string", () => {
+  it("add-issue returns the new id as a string", () => {
     commands.init(cwd, []);
-    const id = commands["add-item"](cwd, ["Dark mode"]);
+    const id = commands["add-issue"](cwd, ["Dark mode"]);
     expect(id).toBe("1");
-    expect(readItems(cwd)[0].title).toBe("Dark mode");
+    expect(readIssues(cwd)[0].title).toBe("Dark mode");
   });
 
-  it("create-sprint then add-item --sprint assigns it", () => {
+  it("create-sprint then add-issue --sprint assigns it", () => {
     commands.init(cwd, []);
     commands["create-sprint"](cwd, ["foundation", "--goal", "build it"]);
-    commands["add-item"](cwd, ["Dark mode", "--sprint", "foundation"]);
-    expect(readItems(cwd)[0].sprint).toBe("foundation");
+    commands["add-issue"](cwd, ["Dark mode", "--sprint", "foundation"]);
+    expect(readIssues(cwd)[0].sprint).toBe("foundation");
   });
 
-  it("move --backlog sends an item back to the backlog", () => {
+  it("move --backlog sends an issue back to the backlog", () => {
     commands.init(cwd, []);
     commands["create-sprint"](cwd, ["foundation", "--goal", "g"]);
-    commands["add-item"](cwd, ["Dark mode", "--sprint", "foundation"]);
+    commands["add-issue"](cwd, ["Dark mode", "--sprint", "foundation"]);
     commands.move(cwd, ["1", "--backlog"]);
-    expect(readItems(cwd)[0].sprint).toBe("");
+    expect(readIssues(cwd)[0].sprint).toBe("");
   });
 
   it("set-active marks the sprint active", () => {
@@ -54,7 +54,7 @@ describe("command registry", () => {
 
   it("spec returns the spec file path", () => {
     commands.init(cwd, []);
-    commands["add-item"](cwd, ["Dark mode"]);
+    commands["add-issue"](cwd, ["Dark mode"]);
     const result = commands.spec(cwd, ["1"]);
     expect(typeof result).toBe("string");
     expect(fs.existsSync(result as string)).toBe(true);
@@ -62,14 +62,14 @@ describe("command registry", () => {
 
   it("show renders the backlog by default", () => {
     commands.init(cwd, []);
-    commands["add-item"](cwd, ["Dark mode"]);
+    commands["add-issue"](cwd, ["Dark mode"]);
     const result = commands.show(cwd, []);
     expect(result).toContain("Dark mode");
   });
 
   it("show --json renders structured data", () => {
     commands.init(cwd, []);
-    commands["add-item"](cwd, ["Dark mode"]);
+    commands["add-issue"](cwd, ["Dark mode"]);
     const result = commands.show(cwd, ["--json"]) as string;
     expect(JSON.parse(result).backlog[0].title).toBe("Dark mode");
   });
@@ -77,7 +77,7 @@ describe("command registry", () => {
   it("install-skills copies the shipped skills into .claude/skills/", () => {
     commands["install-skills"](cwd, []);
     expect(
-      fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-add-item", "SKILL.md")),
+      fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-add-issue", "SKILL.md")),
     ).toBe(true);
     expect(
       fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-reorganize", "SKILL.md")),

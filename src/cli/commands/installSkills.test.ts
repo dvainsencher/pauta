@@ -25,45 +25,45 @@ describe("installSkills", () => {
   }
 
   it("copies a skill directory into .claude/skills/<name>", () => {
-    writeSkill("pauta-add-item", "# add item\n");
+    writeSkill("pauta-add-issue", "# add issue\n");
     installSkills(cwd, sourceDir);
     const installed = fs.readFileSync(
-      path.join(cwd, ".claude", "skills", "pauta-add-item", "SKILL.md"),
+      path.join(cwd, ".claude", "skills", "pauta-add-issue", "SKILL.md"),
       "utf8",
     );
-    expect(installed).toBe("# add item\n");
+    expect(installed).toBe("# add issue\n");
   });
 
   it("copies every skill subdirectory", () => {
-    writeSkill("pauta-add-item", "# a\n");
+    writeSkill("pauta-add-issue", "# a\n");
     writeSkill("pauta-reorganize", "# b\n");
     installSkills(cwd, sourceDir);
     expect(fs.readdirSync(path.join(cwd, ".claude", "skills")).sort()).toEqual([
-      "pauta-add-item",
+      "pauta-add-issue",
       "pauta-reorganize",
     ]);
   });
 
   it("returns the names of the skills installed", () => {
-    writeSkill("pauta-add-item", "# a\n");
+    writeSkill("pauta-add-issue", "# a\n");
     writeSkill("pauta-reorganize", "# b\n");
-    expect(installSkills(cwd, sourceDir).sort()).toEqual(["pauta-add-item", "pauta-reorganize"]);
+    expect(installSkills(cwd, sourceDir).sort()).toEqual(["pauta-add-issue", "pauta-reorganize"]);
   });
 
   it("overwrites stale content from a previous install", () => {
-    writeSkill("pauta-add-item", "# old\n");
+    writeSkill("pauta-add-issue", "# old\n");
     installSkills(cwd, sourceDir);
-    fs.writeFileSync(path.join(sourceDir, "pauta-add-item", "SKILL.md"), "# new\n");
+    fs.writeFileSync(path.join(sourceDir, "pauta-add-issue", "SKILL.md"), "# new\n");
     installSkills(cwd, sourceDir);
     const installed = fs.readFileSync(
-      path.join(cwd, ".claude", "skills", "pauta-add-item", "SKILL.md"),
+      path.join(cwd, ".claude", "skills", "pauta-add-issue", "SKILL.md"),
       "utf8",
     );
     expect(installed).toBe("# new\n");
   });
 
   it("creates .claude/skills even if .claude doesn't exist yet", () => {
-    writeSkill("pauta-add-item", "# a\n");
+    writeSkill("pauta-add-issue", "# a\n");
     installSkills(cwd, sourceDir);
     expect(fs.statSync(path.join(cwd, ".claude", "skills")).isDirectory()).toBe(true);
   });

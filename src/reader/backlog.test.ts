@@ -2,16 +2,16 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { readItems } from "../storage/itemsStore.js";
-import { addItem } from "../cli/commands/addItem.js";
+import { readIssues } from "../storage/issuesStore.js";
+import { addIssue } from "../cli/commands/addIssue.js";
 import { createSprint } from "../cli/commands/createSprint.js";
 import { init } from "../cli/commands/init.js";
 import { move } from "../cli/commands/move.js";
-import { backlogItems } from "./backlog.js";
+import { backlogIssues } from "./backlog.js";
 
-describe("backlogItems", () => {
-  it("returns only items with an empty sprint", () => {
-    const items = [
+describe("backlogIssues", () => {
+  it("returns only issues with an empty sprint", () => {
+    const issues = [
       { id: 1, title: "a", status: "idea" as const, sprint: "", createdAt: "", updatedAt: "" },
       {
         id: 2,
@@ -22,7 +22,7 @@ describe("backlogItems", () => {
         updatedAt: "",
       },
     ];
-    expect(backlogItems(items)).toEqual([items[0]]);
+    expect(backlogIssues(issues)).toEqual([issues[0]]);
   });
 
   describe("integration with add/move", () => {
@@ -38,15 +38,15 @@ describe("backlogItems", () => {
       fs.rmSync(cwd, { recursive: true, force: true });
     });
 
-    it("includes a freshly added item with no sprint", () => {
-      addItem(cwd, "Dark mode");
-      expect(backlogItems(readItems(cwd))).toHaveLength(1);
+    it("includes a freshly added issue with no sprint", () => {
+      addIssue(cwd, "Dark mode");
+      expect(backlogIssues(readIssues(cwd))).toHaveLength(1);
     });
 
-    it("excludes an item once moved into a sprint", () => {
-      const id = addItem(cwd, "Dark mode");
+    it("excludes an issue once moved into a sprint", () => {
+      const id = addIssue(cwd, "Dark mode");
       move(cwd, id, "foundation");
-      expect(backlogItems(readItems(cwd))).toHaveLength(0);
+      expect(backlogIssues(readIssues(cwd))).toHaveLength(0);
     });
   });
 });

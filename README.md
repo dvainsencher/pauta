@@ -20,8 +20,8 @@ That's what this is.
 
 ## Core concepts
 
-### Item
-The atom of work. An item has:
+### Issue
+The atom of work. An issue has:
 
 | field | meaning |
 |---|---|
@@ -31,9 +31,9 @@ The atom of work. An item has:
 | `sprint` | a sprint name, or empty |
 | spec | optional file at `specs/<id>.md` for detailed write-ups |
 
-**Empty `sprint` = the backlog.** The backlog is just every item not assigned to a sprint — a real inbox for raw ideas.
+**Empty `sprint` = the backlog.** The backlog is just every issue not assigned to a sprint — a real inbox for raw ideas.
 
-There is deliberately **no dependency field and no within-sprint ordering**. Logical order between items is the user's concern: write "do this after #42" as prose in the spec. The system doesn't parse, validate, or sort by it.
+There is deliberately **no dependency field and no within-sprint ordering**. Logical order between issues is the user's concern: write "do this after #42" as prose in the spec. The system doesn't parse, validate, or sort by it.
 
 ### Sprint
 A **context batch**: a set of related work sized to fit comfortably in an agent's context — not a time period. A sprint has:
@@ -46,7 +46,7 @@ A **context batch**: a set of related work sized to fit comfortably in an agent'
 | `goal` | what this batch is for |
 | `notes` | optional |
 
-A sprint's **membership is not stored on the sprint** — it's derived by filtering items whose `sprint` matches. One source of truth, no drift.
+A sprint's **membership is not stored on the sprint** — it's derived by filtering issues whose `sprint` matches. One source of truth, no drift.
 
 **Order is advisory, not structural.** `position` is just a sort key for display. Plan several sprints ahead (positions 10, 20, 30) and they read as an intended sequence — but the sequence binds nothing. Reorder with a single edit (`set-position export 5`), and nothing renumbers. Activating a sprint out of "order" (work on #11 before #8) is not a transgression because there is no enforced order. Gaps of 10 let you slot a new sprint between two existing ones without touching either.
 
@@ -58,8 +58,8 @@ A sprint's **membership is not stored on the sprint** — it's derived by filter
 
 Everything follows from this:
 
-- **Mechanical operations cost zero tokens.** Adding an item, moving it, creating a sprint — these are file edits. A human runs the command; an agent runs the *same* command. No model call either way.
-- **The agent's job is read → reason → emit commands.** After a design discussion, the agent reads the whole plan, decides where a new item belongs or how to regroup, and expresses that as a sequence of writer-command calls. The files only ever change through the CLI, so the format stays valid by construction and you never get two-writers drift.
+- **Mechanical operations cost zero tokens.** Adding an issue, moving it, creating a sprint — these are file edits. A human runs the command; an agent runs the *same* command. No model call either way.
+- **The agent's job is read → reason → emit commands.** After a design discussion, the agent reads the whole plan, decides where a new issue belongs or how to regroup, and expresses that as a sequence of writer-command calls. The files only ever change through the CLI, so the format stays valid by construction and you never get two-writers drift.
 - **Smart operations sit *above* this line.** They read via the reader, reason, and emit the same writer commands. They get no special file access.
 
 ```
@@ -71,7 +71,7 @@ Everything follows from this:
                   via    ▼               ▼  via
         ┌──────────────────┐   ┌────────────────────────┐
         │ reader (no LLM)  │   │ writers (no LLM)        │
-        │ show / show --json│   │ add-item, move, ...     │
+        │ show / show --json│   │ add-issue, move, ...     │
         └──────────────────┘   └───────────┬────────────┘
                                             │ sole mutators
                                             ▼
@@ -84,10 +84,10 @@ Everything follows from this:
 
 ```
 docs/roadmap/
-  items.jsonl      # one item per line — clean diffs, append-friendly, parse-safe
+  issues.jsonl     # one issue per line — clean diffs, append-friendly, parse-safe
   sprints.json     # sprint metadata (name, position, status, goal, notes)
   specs/
-    3.md           # optional, keyed by item id
+    3.md           # optional, keyed by issue id
     12.md
 ```
 
@@ -101,11 +101,11 @@ docs/roadmap/
 ### Writers (mechanical · zero tokens · the only mutators)
 
 ```
-pauta init                                 # scaffold docs/roadmap/ in a project (empty items, sprints, specs/)
+pauta init                                 # scaffold docs/roadmap/ in a project (empty issues, sprints, specs/)
 
-pauta add-item "<title>" [--status idea|ready] [--sprint <name>]   # prints new id
-pauta edit-item <id> [--title "..."] [--status ...]
-pauta remove-item <id>
+pauta add-issue "<title>" [--status idea|ready] [--sprint <name>]   # prints new id
+pauta edit-issue <id> [--title "..."] [--status ...]
+pauta remove-issue <id>
 pauta move <id> <sprint-name>              # assign to a sprint
 pauta move <id> --backlog                  # send back to the inbox
 pauta set-status <id> <status>
@@ -125,9 +125,9 @@ All of the above are implemented (`SPRINTS.md`'s `foundation` and `agent-skills`
 
 ### Reader (the linchpin — rich enough that the agent never opens raw files)
 
-Implemented (`SPRINTS.md`'s `the-reader` sprint). By default, done items and done
+Implemented (`SPRINTS.md`'s `the-reader` sprint). By default, done issues and done
 sprints are hidden — `--done` reveals them. `--sprint <name>` shows only that
-sprint's items and omits the backlog section.
+sprint's issues and omits the backlog section.
 
 ```
 pauta show [--sprint <name>] [--done]      # the human-scannable whole plan
@@ -166,7 +166,7 @@ type.
 
 ```
 pauta-suggest-batches        # skill: reads the backlog, proposes sprint groupings; you confirm
-pauta-bootstrap              # skill: reads repo code + docs, proposes an initial set of items/sprints
+pauta-bootstrap              # skill: reads repo code + docs, proposes an initial set of issues/sprints
 ```
 
 `pauta-bootstrap` works on an existing codebase *or* a greenfield project with only docs (or nothing).
@@ -177,13 +177,13 @@ pauta-bootstrap              # skill: reads repo code + docs, proposes an initia
 
 The same CLI is invoked two ways:
 
-- **By you, by hand** — `pauta add-item "..."` at the terminal, or migrating a scratchpad note.
+- **By you, by hand** — `pauta add-issue "..."` at the terminal, or migrating a scratchpad note.
 - **By an agent, via a Claude Code skill** — after a feature discussion, the agent reads `show --json`, reasons, and calls the writer commands. It never edits the files directly.
 
 The capture flows this supports:
 
 - **At the desk:** discuss with the agent → "add this and slot it" → agent emits the right commands.
-- **Away from the desk:** jot into a dumb scratchpad file → later run `add-item` per note (yourself, or hand the scratchpad to the agent and say "import these"). The CLI is the single funnel every note passes through to become a real item — so you never copy-paste into the roadmap files by hand.
+- **Away from the desk:** jot into a dumb scratchpad file → later run `add-issue` per note (yourself, or hand the scratchpad to the agent and say "import these"). The CLI is the single funnel every note passes through to become a real issue — so you never copy-paste into the roadmap files by hand.
 
 An external inspector agent (looking at a project you're *not* actively coding in) is the same system pointed at the same files from outside — a deployment choice, not a separate architecture.
 
@@ -207,22 +207,22 @@ depend on any unpublished package:
 
 ```
 npm install                # wires up node_modules/.bin/pauta
-npx pauta init              # scaffold docs/roadmap/ (empty items, sprints, specs/)
+npx pauta init              # scaffold docs/roadmap/ (empty issues, sprints, specs/)
 npx pauta install-skills    # copy the Claude Code skill files into .claude/skills/
 ```
 
 `install-skills` is mechanical (no LLM) — it copies every skill directory
-(`pauta-add-item`, `pauta-reorganize`, `pauta-suggest-batches`, `pauta-bootstrap`)
+(`pauta-add-issue`, `pauta-reorganize`, `pauta-suggest-batches`, `pauta-bootstrap`)
 from the installed package's own `skills/` directory into the project's
 `.claude/skills/`, overwriting on re-run. Once installed, the skills themselves
 enforce the one rule: read via `pauta show --json`, write only via `pauta`
 commands, never touch `docs/roadmap/*` directly.
 
-**Existing project:** `init`, then `install-skills`, then either add items by hand
-(or via the `pauta-add-item` skill during a feature discussion), or ask the agent
+**Existing project:** `init`, then `install-skills`, then either add issues by hand
+(or via the `pauta-add-issue` skill during a feature discussion), or ask the agent
 to run the `pauta-bootstrap` skill to seed a starting plan from your existing code.
 **New project:** same — `init`, `install-skills`, then `pauta-bootstrap` from
-whatever docs exist (or start empty and add items as ideas come up).
+whatever docs exist (or start empty and add issues as ideas come up).
 
 `init`, the CLI, and `install-skills` are all mechanical (no LLM); only the
 `pauta-suggest-batches` and `pauta-bootstrap` skills read content and cost tokens.

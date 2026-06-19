@@ -1,5 +1,5 @@
-import { editItem } from "./editItem.js";
+import { editIssue } from "./editIssue.js";
 
 export function setStatus(cwd: string, id: number, status: string): void {
-  editItem(cwd, id, { status });
+  editIssue(cwd, id, { status });
 }

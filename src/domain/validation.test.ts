@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { Item, Sprint } from "./types.js";
+import type { Issue, Sprint } from "./types.js";
 import {
-  assertItemExists,
-  assertItemStatus,
+  assertIssueExists,
+  assertIssueStatus,
   assertSprintExists,
   assertSprintNameAvailable,
   assertSprintStatus,
@@ -12,7 +12,7 @@ function sprint(name: string): Sprint {
   return { name, position: 10, status: "planned", goal: "", notes: "" };
 }
 
-function item(id: number): Item {
+function issue(id: number): Issue {
   return {
     id,
     title: "x",
@@ -45,23 +45,23 @@ describe("assertSprintNameAvailable", () => {
   });
 });
 
-describe("assertItemExists", () => {
-  it("does not throw when the item exists", () => {
-    expect(() => assertItemExists([item(1)], 1)).not.toThrow();
+describe("assertIssueExists", () => {
+  it("does not throw when the issue exists", () => {
+    expect(() => assertIssueExists([issue(1)], 1)).not.toThrow();
   });
 
-  it("throws when the item does not exist", () => {
-    expect(() => assertItemExists([item(1)], 999)).toThrow(/999/);
+  it("throws when the issue does not exist", () => {
+    expect(() => assertIssueExists([issue(1)], 999)).toThrow(/999/);
   });
 });
 
-describe("assertItemStatus", () => {
+describe("assertIssueStatus", () => {
   it("does not throw for a valid status", () => {
-    expect(() => assertItemStatus("doing")).not.toThrow();
+    expect(() => assertIssueStatus("doing")).not.toThrow();
   });
 
   it("throws for an invalid status", () => {
-    expect(() => assertItemStatus("bogus")).toThrow(/bogus/);
+    expect(() => assertIssueStatus("bogus")).toThrow(/bogus/);
   });
 });
 

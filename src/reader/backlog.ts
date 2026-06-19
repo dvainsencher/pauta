@@ -1,5 +1,5 @@
-import type { Item } from "../domain/types.js";
+import type { Issue } from "../domain/types.js";
 
-export function backlogItems(items: Item[]): Item[] {
-  return items.filter((item) => item.sprint === "");
+export function backlogIssues(issues: Issue[]): Issue[] {
+  return issues.filter((issue) => issue.sprint === "");
 }
