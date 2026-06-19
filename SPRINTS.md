@@ -15,6 +15,8 @@ These are real ideas we discussed and chose *not* to schedule yet. They live in 
 #102  idea   "Feature helper" mode — discuss/extract features from a project (explicitly out of scope for now; scope creep risk)
 #103  idea   Scratchpad import helper — hand a notes file to the agent, it emits add-item calls
 #104  done   Decide raw-file readability: resolved — JSONL/JSON only, not hand-readable; `show` is the only human-facing view (see CLAUDE.md)
+#105  idea   install-skills: friendly error when the package's skills/ source dir is missing/unreadable, matching the assertX-style validation used elsewhere in src/cli/commands (raised in PR #4 review)
+#106  idea   install-skills: add a test covering the missing-source-dir path once #105 lands (raised in PR #4 review)
 ```
 
 ---
