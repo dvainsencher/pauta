@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { assertDirectoryReadable } from "../../domain/validation.js";
+import { assertDirectoryExists } from "../../domain/validation.js";
 
 export function installSkills(cwd: string, sourceDir: string): string[] {
-  assertDirectoryReadable(sourceDir, "Skills source directory");
+  assertDirectoryExists(sourceDir, "Skills source directory");
 
   const targetRoot = path.join(cwd, ".claude", "skills");
   fs.mkdirSync(targetRoot, { recursive: true });

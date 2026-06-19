@@ -35,7 +35,7 @@ export function assertSprintStatus(status: string): void {
   }
 }
 
-export function assertDirectoryReadable(dirPath: string, label: string): void {
+export function assertDirectoryExists(dirPath: string, label: string): void {
   let stats;
   try {
     stats = statSync(dirPath);
