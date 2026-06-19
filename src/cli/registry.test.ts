@@ -73,4 +73,14 @@ describe("command registry", () => {
     const result = commands.show(cwd, ["--json"]) as string;
     expect(JSON.parse(result).backlog[0].title).toBe("Dark mode");
   });
+
+  it("install-skills copies the shipped skills into .claude/skills/", () => {
+    commands["install-skills"](cwd, []);
+    expect(
+      fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-add-item", "SKILL.md")),
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-reorganize", "SKILL.md")),
+    ).toBe(true);
+  });
 });

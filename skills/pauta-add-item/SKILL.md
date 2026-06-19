@@ -1,0 +1,38 @@
+---
+name: pauta-add-item
+description: This skill should be used when, during or after a feature/design discussion in a project that uses pauta, the user wants to capture the idea as a backlog item — phrases like "add this to the backlog", "track this", "let's add an item for X", "slot this into a sprint", or "add this and slot it".
+---
+
+# pauta: add item
+
+This project tracks work with `pauta`, a flat-file backlog/sprint manager. The one
+rule that matters: **the `pauta` CLI is the only writer to `docs/roadmap/*`.** You
+read the plan via `pauta show --json` and you write to it only by calling `pauta`
+commands — never by editing `docs/roadmap/items.jsonl`, `docs/roadmap/sprints.json`,
+or `docs/roadmap/specs/*.md` directly, even though they're plain files you technically
+could open.
+
+## Steps
+
+1. Run `pauta show --json` to see the current backlog and sprints (names, goals,
+   positions, which sprint is active, existing items).
+2. From the discussion, decide:
+   - **title** — one line summarizing the work.
+   - **status** — `idea` (default) if it's a raw thought, `ready` if it's well-defined
+     enough to start.
+   - **sprint** — leave unset (backlog) unless the discussion clearly ties it to an
+     existing sprint by name; don't invent a new sprint just to file one item (that's
+     a job for the reorganize skill, not this one).
+3. Call `pauta add-item "<title>" [--status idea|ready] [--sprint <name>]`. It prints
+   the new item's id.
+4. If the discussion produced more than a one-line idea — open questions, design
+   notes, acceptance criteria — run `pauta spec <id>` to create `specs/<id>.md`, then
+   write the detail into that file with your normal file-editing tools (the spec
+   *content* isn't roadmap metadata, so editing it directly is fine — only
+   `items.jsonl`/`sprints.json` and spec *creation* go through the CLI).
+5. If the user is describing an item that already exists but should move sprints,
+   use `pauta move <id> <sprint-name>` or `pauta move <id> --backlog` instead of
+   adding a duplicate.
+
+Tell the user the new item's id and where it landed (backlog or which sprint) in one
+line — don't narrate the steps above.

@@ -15,6 +15,8 @@ These are real ideas we discussed and chose *not* to schedule yet. They live in 
 #102  idea   "Feature helper" mode — discuss/extract features from a project (explicitly out of scope for now; scope creep risk)
 #103  idea   Scratchpad import helper — hand a notes file to the agent, it emits add-item calls
 #104  done   Decide raw-file readability: resolved — JSONL/JSON only, not hand-readable; `show` is the only human-facing view (see CLAUDE.md)
+#105  idea   install-skills: friendly error when the package's skills/ source dir is missing/unreadable, matching the assertX-style validation used elsewhere in src/cli/commands (raised in PR #4 review)
+#106  idea   install-skills: add a test covering the missing-source-dir path once #105 lands (raised in PR #4 review)
 ```
 
 ---
@@ -67,21 +69,24 @@ seeded to match the README's example plan.
 
 ---
 
-## SPRINT agent-skills   (position 30)
+## ✅ SPRINT agent-skills   (position 30)
 
 **goal:** wire it into Claude Code so a design discussion ends in clean command calls, never direct file edits.
 
 ```
-#16  ready  Distribute the CLI — script on PATH or repo-local; document how a project gets `roadmap`
-#17  ready  Install skill files into the project's Claude Code skills location (the agent picks them up)
-#18  ready  Existing vs new project setup: existing → init + bootstrap (read code); new → init + optional bootstrap (docs/empty)
-#19  ready  Claude Code skill: add roadmap item after a feature discussion (read show --json → emit add-item/move)
-#20  ready  Claude Code skill: reorganize — read everything, propose moves/new sprints, emit writer commands only
-#21  ready  Enforce the rule in the skill instructions: read via show --json, write via commands, never touch files
+#16  done   Distribute the CLI — document how a project gets `pauta` (npm devDependency via git/file URL; not published to a registry yet)
+#17  done   Install skill files into the project's Claude Code skills location (`pauta install-skills` copies skills/ into .claude/skills/)
+#18  done   Existing vs new project setup: documented in README — bootstrap doesn't exist yet (smart-ops sprint), so both paths are init + install-skills + add items by hand for now
+#19  done   Claude Code skill: add roadmap item after a feature discussion (skills/pauta-add-item — read show --json → emit add-item/move)
+#20  done   Claude Code skill: reorganize — read everything, propose moves/new sprints, emit writer commands only (skills/pauta-reorganize)
+#21  done   Enforce the rule in the skill instructions: read via show --json, write via commands, never touch files (baked into both SKILL.md files)
 #22  idea   Scratchpad import: hand a notes file to the skill, it emits one add-item per note (resolves #103)
 ```
 
-**Exit check:** in a fresh clone of a real project, you can install the CLI + skills, run `init`, and a Claude Code session's "add this and slot it" results in the agent calling commands — files only ever written by the CLI.
+**Exit check:** ✅ verified — `pauta install-skills` run against a scratch project
+directory (regardless of cwd) correctly copies `pauta-add-item` and
+`pauta-reorganize` from the package's own `skills/` dir into `.claude/skills/`,
+overwriting on re-run.
 
 ---
 
