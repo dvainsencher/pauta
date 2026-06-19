@@ -1,6 +1,10 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import type { Issue, Sprint } from "./types.js";
 import {
+  assertDirectoryReadable,
   assertIssueExists,
   assertIssueStatus,
   assertSprintExists,
@@ -72,5 +76,34 @@ describe("assertSprintStatus", () => {
 
   it("throws for an invalid status", () => {
     expect(() => assertSprintStatus("bogus")).toThrow(/bogus/);
+  });
+});
+
+describe("assertDirectoryReadable", () => {
+  it("does not throw for an existing directory", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-dir-"));
+    try {
+      expect(() => assertDirectoryReadable(dir, "Some directory")).not.toThrow();
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("throws when the path does not exist", () => {
+    expect(() => assertDirectoryReadable("/does/not/exist", "Some directory")).toThrow(
+      /Some directory.*does not exist/,
+    );
+  });
+
+  it("throws when the path is not a directory", () => {
+    const file = path.join(os.tmpdir(), `pauta-test-file-${Date.now()}`);
+    fs.writeFileSync(file, "x");
+    try {
+      expect(() => assertDirectoryReadable(file, "Some directory")).toThrow(
+        /Some directory.*is not a directory/,
+      );
+    } finally {
+      fs.rmSync(file, { force: true });
+    }
   });
 });
