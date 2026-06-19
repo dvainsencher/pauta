@@ -1,22 +1,22 @@
 import fs from "node:fs";
-import type { Item, Sprint } from "../domain/types.js";
+import type { Issue, Sprint } from "../domain/types.js";
 import { assertSprintExists } from "../domain/validation.js";
 import { specFilePath } from "../storage/paths.js";
-import { readItems } from "../storage/itemsStore.js";
+import { readIssues } from "../storage/issuesStore.js";
 import { readSprints } from "../storage/sprintsStore.js";
-import { backlogItems } from "./backlog.js";
+import { backlogIssues } from "./backlog.js";
 
-export interface ItemView extends Item {
+export interface IssueView extends Issue {
   hasSpec: boolean;
 }
 
 export interface SprintGroup extends Sprint {
   active: boolean;
-  items: ItemView[];
+  issues: IssueView[];
 }
 
 export interface Plan {
-  backlog: ItemView[];
+  backlog: IssueView[];
   sprints: SprintGroup[];
   filteredBySprint?: string;
 }
@@ -27,22 +27,22 @@ export interface BuildPlanOptions {
 }
 
 export function buildPlan(cwd: string, options: BuildPlanOptions): Plan {
-  const items = readItems(cwd);
+  const issues = readIssues(cwd);
   const sprints = readSprints(cwd);
 
   if (options.sprint !== undefined) {
     assertSprintExists(sprints, options.sprint);
   }
 
-  const toView = (item: Item): ItemView => ({
-    ...item,
-    hasSpec: fs.existsSync(specFilePath(cwd, item.id)),
+  const toView = (issue: Issue): IssueView => ({
+    ...issue,
+    hasSpec: fs.existsSync(specFilePath(cwd, issue.id)),
   });
 
-  const itemsForSprint = (sprintName: string): ItemView[] =>
-    items
-      .filter((item) => item.sprint === sprintName)
-      .filter((item) => options.done || item.status !== "done")
+  const issuesForSprint = (sprintName: string): IssueView[] =>
+    issues
+      .filter((issue) => issue.sprint === sprintName)
+      .filter((issue) => options.done || issue.status !== "done")
       .sort((a, b) => a.id - b.id)
       .map(toView);
 
@@ -52,7 +52,7 @@ export function buildPlan(cwd: string, options: BuildPlanOptions): Plan {
     .map((sprint) => ({
       ...sprint,
       active: sprint.status === "active",
-      items: itemsForSprint(sprint.name),
+      issues: issuesForSprint(sprint.name),
     }))
     .sort((a, b) => {
       if (a.active !== b.active) {
@@ -63,8 +63,8 @@ export function buildPlan(cwd: string, options: BuildPlanOptions): Plan {
 
   const backlog =
     options.sprint === undefined
-      ? backlogItems(items)
-          .filter((item) => options.done || item.status !== "done")
+      ? backlogIssues(issues)
+          .filter((issue) => options.done || issue.status !== "done")
           .sort((a, b) => a.id - b.id)
           .map(toView)
       : [];

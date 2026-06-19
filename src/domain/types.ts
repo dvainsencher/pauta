@@ -1,11 +1,11 @@
-export type ItemStatus = "idea" | "ready" | "doing" | "done";
+export type IssueStatus = "idea" | "ready" | "doing" | "done";
 
 export type SprintStatus = "planned" | "active" | "done";
 
-export interface Item {
+export interface Issue {
   id: number;
   title: string;
-  status: ItemStatus;
+  status: IssueStatus;
   sprint: string;
   createdAt: string;
   updatedAt: string;
@@ -19,5 +19,5 @@ export interface Sprint {
   notes: string;
 }
 
-export const ITEM_STATUSES: readonly ItemStatus[] = ["idea", "ready", "doing", "done"];
+export const ISSUE_STATUSES: readonly IssueStatus[] = ["idea", "ready", "doing", "done"];
 export const SPRINT_STATUSES: readonly SprintStatus[] = ["planned", "active", "done"];

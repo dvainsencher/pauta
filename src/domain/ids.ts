@@ -1,6 +1,6 @@
-import type { Item } from "./types.js";
+import type { Issue } from "./types.js";
 
-export function nextId(items: Item[]): number {
-  const maxId = items.reduce((max, item) => Math.max(max, item.id), 0);
+export function nextId(issues: Issue[]): number {
+  const maxId = issues.reduce((max, issue) => Math.max(max, issue.id), 0);
   return maxId + 1;
 }

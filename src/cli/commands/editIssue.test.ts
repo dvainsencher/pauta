@@ -4,10 +4,10 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { readIssues } from "../../storage/issuesStore.js";
 import { addIssue } from "./addIssue.js";
+import { editIssue } from "./editIssue.js";
 import { init } from "./init.js";
-import { setStatus } from "./setStatus.js";
 
-describe("setStatus", () => {
+describe("editIssue", () => {
   let cwd: string;
   let id: number;
 
@@ -21,21 +21,28 @@ describe("setStatus", () => {
     fs.rmSync(cwd, { recursive: true, force: true });
   });
 
-  it("sets the status", () => {
-    setStatus(cwd, id, "doing");
+  it("updates the title", () => {
+    editIssue(cwd, id, { title: "Light mode" });
+    expect(readIssues(cwd)[0].title).toBe("Light mode");
+  });
+
+  it("updates the status", () => {
+    editIssue(cwd, id, { status: "doing" });
     expect(readIssues(cwd)[0].status).toBe("doing");
   });
 
-  it("allows jumping straight to done, unenforced transitions", () => {
-    setStatus(cwd, id, "done");
-    expect(readIssues(cwd)[0].status).toBe("done");
+  it("bumps updatedAt", () => {
+    const before = readIssues(cwd)[0].updatedAt;
+    editIssue(cwd, id, { title: "Light mode" });
+    const after = readIssues(cwd)[0].updatedAt;
+    expect(after >= before).toBe(true);
   });
 
   it("throws for a nonexistent id", () => {
-    expect(() => setStatus(cwd, 999, "done")).toThrow(/999/);
+    expect(() => editIssue(cwd, 999, { title: "x" })).toThrow(/999/);
   });
 
   it("rejects an invalid status", () => {
-    expect(() => setStatus(cwd, id, "bogus")).toThrow(/bogus/);
+    expect(() => editIssue(cwd, id, { status: "bogus" })).toThrow(/bogus/);
   });
 });

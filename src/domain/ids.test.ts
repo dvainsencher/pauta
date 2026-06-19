@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { Item } from "./types.js";
+import type { Issue } from "./types.js";
 import { nextId } from "./ids.js";
 
-function item(id: number): Item {
+function issue(id: number): Issue {
   return {
     id,
     title: "x",
@@ -19,10 +19,10 @@ describe("nextId", () => {
   });
 
   it("returns max + 1", () => {
-    expect(nextId([item(1), item(5)])).toBe(6);
+    expect(nextId([issue(1), issue(5)])).toBe(6);
   });
 
-  it("is unaffected by item order", () => {
-    expect(nextId([item(5), item(1), item(3)])).toBe(6);
+  it("is unaffected by issue order", () => {
+    expect(nextId([issue(5), issue(1), issue(3)])).toBe(6);
   });
 });

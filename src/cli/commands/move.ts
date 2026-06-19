@@ -1,31 +1,31 @@
-import { assertItemExists, assertSprintExists } from "../../domain/validation.js";
-import { readItems, writeItems } from "../../storage/itemsStore.js";
+import { assertIssueExists, assertSprintExists } from "../../domain/validation.js";
+import { readIssues, writeIssues } from "../../storage/issuesStore.js";
 import { readSprints } from "../../storage/sprintsStore.js";
 
 export function move(cwd: string, id: number, sprintName: string): void {
-  const items = readItems(cwd);
-  assertItemExists(items, id);
+  const issues = readIssues(cwd);
+  assertIssueExists(issues, id);
   assertSprintExists(readSprints(cwd), sprintName);
 
-  writeMoved(cwd, items, id, sprintName);
+  writeMoved(cwd, issues, id, sprintName);
 }
 
 export function moveToBacklog(cwd: string, id: number): void {
-  const items = readItems(cwd);
-  assertItemExists(items, id);
+  const issues = readIssues(cwd);
+  assertIssueExists(issues, id);
 
-  writeMoved(cwd, items, id, "");
+  writeMoved(cwd, issues, id, "");
 }
 
 function writeMoved(
   cwd: string,
-  items: ReturnType<typeof readItems>,
+  issues: ReturnType<typeof readIssues>,
   id: number,
   sprint: string,
 ): void {
   const now = new Date().toISOString();
-  const updated = items.map((item) =>
-    item.id === id ? { ...item, sprint, updatedAt: now } : item,
+  const updated = issues.map((issue) =>
+    issue.id === id ? { ...issue, sprint, updatedAt: now } : issue,
   );
-  writeItems(cwd, updated);
+  writeIssues(cwd, updated);
 }

@@ -1,10 +1,10 @@
-import { addItem } from "./commands/addItem.js";
+import { addIssue } from "./commands/addIssue.js";
 import { createSprint } from "./commands/createSprint.js";
-import { editItem } from "./commands/editItem.js";
+import { editIssue } from "./commands/editIssue.js";
 import { editSprint } from "./commands/editSprint.js";
 import { init } from "./commands/init.js";
 import { move, moveToBacklog } from "./commands/move.js";
-import { removeItem } from "./commands/removeItem.js";
+import { removeIssue } from "./commands/removeIssue.js";
 import { setActive } from "./commands/setActive.js";
 import { setPosition } from "./commands/setPosition.js";
 import { setSprintStatus } from "./commands/setSprintStatus.js";
@@ -22,29 +22,29 @@ export const commands: Record<string, CommandHandler> = {
     init(cwd);
   },
 
-  "add-item": (cwd, args) => {
+  "add-issue": (cwd, args) => {
     const parsed = parseArgs(args);
     const title = requirePositional(parsed, 0, "title");
-    const id = addItem(cwd, title, {
+    const id = addIssue(cwd, title, {
       status: parsed.flags.status as string | undefined,
       sprint: parsed.flags.sprint as string | undefined,
     });
     return String(id);
   },
 
-  "edit-item": (cwd, args) => {
+  "edit-issue": (cwd, args) => {
     const parsed = parseArgs(args);
     const id = requireIntPositional(parsed, 0, "id");
-    editItem(cwd, id, {
+    editIssue(cwd, id, {
       title: parsed.flags.title as string | undefined,
       status: parsed.flags.status as string | undefined,
     });
   },
 
-  "remove-item": (cwd, args) => {
+  "remove-issue": (cwd, args) => {
     const parsed = parseArgs(args);
     const id = requireIntPositional(parsed, 0, "id");
-    removeItem(cwd, id);
+    removeIssue(cwd, id);
   },
 
   "create-sprint": (cwd, args) => {

@@ -4,8 +4,8 @@ export function roadmapDir(cwd: string): string {
   return path.join(cwd, "docs", "roadmap");
 }
 
-export function itemsFilePath(cwd: string): string {
-  return path.join(roadmapDir(cwd), "items.jsonl");
+export function issuesFilePath(cwd: string): string {
+  return path.join(roadmapDir(cwd), "issues.jsonl");
 }
 
 export function sprintsFilePath(cwd: string): string {

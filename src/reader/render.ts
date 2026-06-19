@@ -1,4 +1,4 @@
-import type { ItemView, Plan, SprintGroup } from "./plan.js";
+import type { IssueView, Plan, SprintGroup } from "./plan.js";
 
 export function renderJson(plan: Plan): string {
   return JSON.stringify(plan, null, 2);
@@ -9,8 +9,8 @@ export function renderPretty(plan: Plan): string {
 
   if (plan.filteredBySprint === undefined) {
     lines.push(`BACKLOG (${plan.backlog.length})`);
-    for (const item of plan.backlog) {
-      lines.push(renderItemLine(item));
+    for (const issue of plan.backlog) {
+      lines.push(renderIssueLine(issue));
     }
   }
 
@@ -20,8 +20,8 @@ export function renderPretty(plan: Plan): string {
     }
     lines.push(renderSprintHeader(sprint));
     lines.push(`  goal: ${sprint.goal}`);
-    for (const item of sprint.items) {
-      lines.push(renderItemLine(item));
+    for (const issue of sprint.issues) {
+      lines.push(renderIssueLine(issue));
     }
   }
 
@@ -33,7 +33,7 @@ function renderSprintHeader(sprint: SprintGroup): string {
   return `${marker}SPRINT ${sprint.name}   (${sprint.status})`;
 }
 
-function renderItemLine(item: ItemView): string {
-  const specTag = item.hasSpec ? "  [spec]" : "";
-  return `  #${item.id}  ${item.status.padEnd(5)} ${item.title}${specTag}`;
+function renderIssueLine(issue: IssueView): string {
+  const specTag = issue.hasSpec ? "  [spec]" : "";
+  return `  #${issue.id}  ${issue.status.padEnd(5)} ${issue.title}${specTag}`;
 }

@@ -26,7 +26,7 @@ describe("renderJson", () => {
 });
 
 describe("renderPretty", () => {
-  it("shows BACKLOG with a count and each item", () => {
+  it("shows BACKLOG with a count and each issue", () => {
     const p = plan({
       backlog: [
         {
@@ -59,7 +59,7 @@ describe("renderPretty", () => {
     expect(out).toContain("Dark mode");
   });
 
-  it("shows an empty backlog as BACKLOG (0) with no item lines", () => {
+  it("shows an empty backlog as BACKLOG (0) with no issue lines", () => {
     expect(renderPretty(plan())).toContain("BACKLOG (0)");
   });
 
@@ -71,8 +71,8 @@ describe("renderPretty", () => {
   it("marks the active sprint with a leading marker, others without", () => {
     const p = plan({
       sprints: [
-        { name: "auth-hardening", position: 10, status: "active", goal: "g", notes: "", active: true, items: [] },
-        { name: "onboarding", position: 20, status: "planned", goal: "g2", notes: "", active: false, items: [] },
+        { name: "auth-hardening", position: 10, status: "active", goal: "g", notes: "", active: true, issues: [] },
+        { name: "onboarding", position: 20, status: "planned", goal: "g2", notes: "", active: false, issues: [] },
       ],
     });
     const out = renderPretty(p);
@@ -83,7 +83,7 @@ describe("renderPretty", () => {
     expect(out).not.toContain("▶ SPRINT onboarding");
   });
 
-  it("shows each sprint's goal and its items", () => {
+  it("shows each sprint's goal and its issues", () => {
     const p = plan({
       sprints: [
         {
@@ -93,7 +93,7 @@ describe("renderPretty", () => {
           goal: "build the mechanical layer",
           notes: "",
           active: false,
-          items: [
+          issues: [
             {
               id: 3,
               title: "Rotate signing keys",

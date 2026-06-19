@@ -1,4 +1,4 @@
-import { ITEM_STATUSES, SPRINT_STATUSES, type Item, type Sprint } from "./types.js";
+import { ISSUE_STATUSES, SPRINT_STATUSES, type Issue, type Sprint } from "./types.js";
 
 export function assertSprintExists(sprints: Sprint[], name: string): void {
   if (!sprints.some((sprint) => sprint.name === name)) {
@@ -6,9 +6,9 @@ export function assertSprintExists(sprints: Sprint[], name: string): void {
   }
 }
 
-export function assertItemExists(items: Item[], id: number): void {
-  if (!items.some((item) => item.id === id)) {
-    throw new Error(`Item #${id} does not exist`);
+export function assertIssueExists(issues: Issue[], id: number): void {
+  if (!issues.some((issue) => issue.id === id)) {
+    throw new Error(`Issue #${id} does not exist`);
   }
 }
 
@@ -18,10 +18,10 @@ export function assertSprintNameAvailable(sprints: Sprint[], name: string): void
   }
 }
 
-export function assertItemStatus(status: string): void {
-  if (!ITEM_STATUSES.includes(status as Item["status"])) {
+export function assertIssueStatus(status: string): void {
+  if (!ISSUE_STATUSES.includes(status as Issue["status"])) {
     throw new Error(
-      `Invalid item status "${status}" — must be one of: ${ITEM_STATUSES.join(", ")}`,
+      `Invalid issue status "${status}" — must be one of: ${ISSUE_STATUSES.join(", ")}`,
     );
   }
 }
