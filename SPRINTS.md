@@ -13,14 +13,11 @@ These are real ideas we discussed and chose *not* to schedule yet. They live in 
 ```
 #101  idea   External inspector agent — run from outside a repo, manage its roadmap without coding in it
 #102  idea   "Feature helper" mode — discuss/extract features from a project (explicitly out of scope for now; scope creep risk)
-#103  idea   Scratchpad-to-issues skill (supersedes the original "emit add-issue calls" framing) — a pre-backlog/pre-sprint interactive step: read a messy notes/scratchpad file, discuss unclear points with the user, then transform notes into issues (and specs where warranted) via the writer commands. Richer than pauta-bootstrap (which seeds from existing code/docs) and pauta-suggest-batches (which only regroups existing issues) — this one's input is unstructured prose, not the existing plan.
 #104  done   Decide raw-file readability: resolved — JSONL/JSON only, not hand-readable; `show` is the only human-facing view (see CLAUDE.md)
-#105  idea   install-skills: friendly error when the package's skills/ source dir is missing/unreadable, matching the assertX-style validation used elsewhere in src/cli/commands (raised in PR #4 review)
-#106  idea   install-skills: add a test covering the missing-source-dir path once #105 lands (raised in PR #4 review)
-#107  idea   pauta spec <id>: scaffold new spec files with a fixed-section skeleton (Problem / Approach / Acceptance criteria / Open questions) instead of an empty file — less blank-page friction, same lightweight philosophy (only new files get the skeleton; existing specs are untouched)
-#108  idea   pauta-add-issue skill: before calling add-issue, judge whether the title alone is clear enough to implement later; if not, ask the user a calibrating "why"/context question first rather than filing an underspecified issue silently
-#109  note   AskUserQuestion (or any structured clarifying-question UI) has no equivalent in most other agentic tools (Cursor/Aider/Windsurf just ask inline in chat) — any pauta skill that asks clarifying questions should degrade to plain chat prompts, not assume a structured widget exists
+#109  note   AskUserQuestion (or any structured clarifying-question UI) has no equivalent in most other agentic tools (Cursor/Aider/Windsurf just ask inline in chat) — any pauta skill that asks clarifying questions should degrade to plain chat prompts, not assume a structured widget exists; applies to #108 below.
 ```
+
+#103, #105-#108 scheduled below (see `install-skills-polish` and `issue-quality` sprints).
 
 ---
 
@@ -83,7 +80,6 @@ seeded to match the README's example plan.
 #19  done   Claude Code skill: add roadmap issue after a feature discussion (skills/pauta-add-issue — read show --json → emit add-issue/move)
 #20  done   Claude Code skill: reorganize — read everything, propose moves/new sprints, emit writer commands only (skills/pauta-reorganize)
 #21  done   Enforce the rule in the skill instructions: read via show --json, write via commands, never touch files (baked into both SKILL.md files)
-#22  idea   Scratchpad import: hand a notes file to the skill, it emits one add-issue per note (resolves #103)
 ```
 
 **Exit check:** ✅ verified — `pauta install-skills` run against a scratch project
@@ -98,10 +94,10 @@ overwriting on re-run.
 **goal:** the token-using layer — the only part that reaches for a model. Sits above the mechanical line; reads via `show --json`, writes via the same writer commands.
 
 ```
-#20  done   suggest-batches — read all issues, propose related groupings as sprints, present for confirmation (skills/pauta-suggest-batches)
-#21  done   bootstrap — read repo code + docs, propose an initial set of issues and sprints (skills/pauta-bootstrap)
-#22  done   bootstrap for greenfield — docs-only or empty project, no code to read (same skill, branches on whether there's code to read)
-#23  done   Confirmation flow — smart ops propose command calls; nothing is written until you approve (same "propose in chat, then execute" pattern as pauta-reorganize, baked into both new skills)
+#24  done   suggest-batches — read all issues, propose related groupings as sprints, present for confirmation (skills/pauta-suggest-batches)
+#25  done   bootstrap — read repo code + docs, propose an initial set of issues and sprints (skills/pauta-bootstrap)
+#26  done   bootstrap for greenfield — docs-only or empty project, no code to read (same skill, branches on whether there's code to read)
+#27  done   Confirmation flow — smart ops propose command calls; nothing is written until you approve (same "propose in chat, then execute" pattern as pauta-reorganize, baked into both new skills)
 ```
 
 Resolved during implementation: these are Claude Code skills, not new `pauta`
@@ -114,6 +110,31 @@ no CLI changes were needed to ship the two new skills.
 propose-in-chat / write-via-writer-commands pattern as the existing skills, and
 `pauta install-skills` (generic over `skills/` subdirectories, confirmed by its
 existing tests) picks both up without any code change.
+
+---
+
+## SPRINT install-skills-polish   (position 50)
+
+**goal:** close out two small PR #4 review items and one blank-page-friction fix. All three are scoped CLI changes, no design open questions.
+
+```
+#105  idea   install-skills: friendly error when the package's skills/ source dir is missing/unreadable, matching the assertX-style validation used elsewhere in src/domain/validation.ts (raised in PR #4 review)
+#106  idea   install-skills: add a test covering the missing-source-dir path once #105 lands (raised in PR #4 review)
+#107  idea   pauta spec <id>: scaffold new spec files with a fixed-section skeleton (Problem / Approach / Acceptance criteria / Open questions) instead of an empty file — less blank-page friction, same lightweight philosophy (only new files get the skeleton; existing specs are untouched)
+```
+
+---
+
+## SPRINT issue-quality   (position 60)
+
+**goal:** stop underspecified issues from being filed silently — the pauta-add-issue skill should recognize a too-vague title and ask one calibrating question before calling `add-issue`.
+
+```
+#103  idea   Scratchpad-to-issues skill — a pre-backlog/pre-sprint interactive step: read a messy notes/scratchpad file, discuss unclear points with the user, then transform notes into issues (and specs where warranted) via the writer commands. Richer than pauta-bootstrap (seeds from existing code/docs) and pauta-suggest-batches (only regroups existing issues) — this one's input is unstructured prose.
+#108  idea   pauta-add-issue skill: before calling add-issue, apply a title-length/vagueness heuristic (short titles, or generic patterns like "fix X" / "improve Y") — if it trips, ask the user one calibrating "why"/context question before filing; otherwise file as-is. Must degrade to plain chat prompts where AskUserQuestion isn't available (see BACKLOG #109).
+```
+
+Design decision: the trigger for #108 is a heuristic (title length / vague-verb pattern match), not an open-ended model judgment call — chosen for predictability and testability over flexibility.
 
 ---
 
