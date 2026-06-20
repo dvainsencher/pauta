@@ -23,11 +23,12 @@ could open.
    - **sprint** — leave unset (backlog) unless the discussion clearly ties it to an
      existing sprint by name; don't invent a new sprint just to file one issue (that's
      a job for the reorganize skill, not this one).
-3. Before filing, apply `pauta-refine`'s definition-clarity check to the candidate
-   title (short title, or a generic vague-verb pattern like "fix X"/"improve Y" with
-   no further context). If it trips, ask the user one calibrating "why"/context
-   question before filing — don't assume a structured question UI is available, a
-   plain chat question works too (see BACKLOG #109). Otherwise file as-is.
+3. Before filing, run `pauta-refine`'s definition-clarity check on the candidate
+   title (there's no spec yet at this point, so only the clarity check applies —
+   consistency/spec-quality are for `pauta-refine` to apply once the issue exists).
+   If it trips, ask the user one calibrating "why"/context question before filing
+   — don't assume a structured question UI is available, a plain chat question
+   works too (see BACKLOG #109). Otherwise file as-is.
 4. Call `pauta add-issue "<title>" [--status idea|ready] [--sprint <name>]`. It prints
    the new issue's id.
 5. If the discussion produced more than a one-line idea — open questions, design

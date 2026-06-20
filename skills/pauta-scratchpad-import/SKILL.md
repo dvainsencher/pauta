@@ -30,7 +30,11 @@ author's own future reference, not as a backlog.
    one) before filing. If a note is too thin to file confidently — a fragment, a
    half-sentence, no clear scope — ask the user one calibrating question (what
    problem it's solving, or what done looks like) rather than inventing detail; a
-   plain chat question is fine if no structured question UI is available.
+   plain chat question is fine if no structured question UI is available. If
+   `pauta-refine` flags the note as a likely duplicate of an existing issue, don't
+   file it — tell the user which issue it overlaps with and ask whether to skip it,
+   merge the note into that issue's spec instead, or file it anyway as a separate
+   issue.
 4. Once a candidate is clear enough (directly, or after the user's answer):
    - `pauta add-issue "<title>" [--status idea|ready]` — leave unset (backlog)
      unless the note clearly ties to an existing sprint by name.
