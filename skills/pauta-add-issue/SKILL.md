@@ -29,6 +29,9 @@ could open.
    If it trips, ask the user one calibrating "why"/context question before filing
    — don't assume a structured question UI is available, a plain chat question
    works too (see BACKLOG #109). Otherwise file as-is.
+   - **Filing directly at `--status ready`** is a bigger commitment than the
+     `idea` default — run `pauta-refine`'s *full* check instead (clarity +
+     consistency + spec quality), not just clarity, before calling `add-issue`.
 4. Call `pauta add-issue "<title>" [--status idea|ready] [--sprint <name>]`. It prints
    the new issue's id.
 5. If the discussion produced more than a one-line idea — open questions, design

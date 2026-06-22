@@ -166,6 +166,7 @@ chat, and on confirmation writes only via the same writer commands a human would
 type.
 
 ```
+pauta-po                     # skill: conversational front door — routes "PO, let's plan the backlog" etc. to the skills below
 pauta-suggest-batches        # skill: reads the backlog, proposes sprint groupings; you confirm
 pauta-bootstrap              # skill: reads repo code + docs, proposes an initial set of issues/sprints
 pauta-migrate                # skill: full-fidelity port of an existing hand-rolled backlog doc, via a reviewable file artifact
@@ -173,6 +174,13 @@ pauta-audit                  # skill: read-only fidelity check of a completed mi
 pauta-scratchpad-import      # skill: reads a messy notes file, files one issue per idea; you confirm
 pauta-refine                 # skill: checks a candidate or existing issue for clarity/consistency/spec quality
 ```
+
+`pauta-po` is a conversational front door over the other six — same propose-then-
+execute discipline as every other skill here, it just routes by intent ("let's plan
+the backlog," "where are we," "turn my notes into issues") instead of requiring you
+to know which skill to invoke. It never bundles migrate/audit/refine's separate
+approval gates into one step; it can chain them in one sitting (migrate → audit →
+an offer to run refine), but each gate still fires on its own.
 
 `pauta-bootstrap` works on an existing codebase *or* a greenfield project with only
 docs (or nothing) — and detects a third case, an existing hand-rolled backlog doc
@@ -238,7 +246,7 @@ npx pauta install-skills    # copy the Claude Code skill files into .claude/skil
 ```
 
 `install-skills` is mechanical (no LLM) — it copies every skill directory
-(`pauta-add-issue`, `pauta-reorganize`, `pauta-suggest-batches`, `pauta-bootstrap`,
+(`pauta-po`, `pauta-add-issue`, `pauta-reorganize`, `pauta-suggest-batches`, `pauta-bootstrap`,
 `pauta-migrate`, `pauta-audit`, `pauta-scratchpad-import`, `pauta-refine`) from the installed
 package's own `skills/` directory into the project's `.claude/skills/`,
 overwriting on re-run. Once installed, the skills themselves enforce the one
@@ -260,8 +268,8 @@ refuses to run if that directory contains anything other than pauta's own files)
 and writes a reviewable mapping artifact before filing anything. See "Smart ops"
 above for what `pauta-migrate` does and doesn't decide on its own.
 
-`init`, the CLI, and `install-skills` are all mechanical (no LLM); only the
-`pauta-suggest-batches` and `pauta-bootstrap` skills read content and cost tokens.
+`init`, the CLI, and `install-skills` are all mechanical (no LLM); `pauta-po` and
+the other Claude Code skills read content and cost tokens.
 
 ---
 
