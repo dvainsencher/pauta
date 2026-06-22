@@ -49,9 +49,15 @@ author's own future reference, not as a backlog.
    what you're about to file (title, status, and whether it gets a spec) before
    calling `add-issue`, the same propose-then-act pattern every other pauta skill
    follows.
-6. After filing, tell the user what was created (ids + titles) and ask whether the
-   scratchpad file itself should be cleared/archived now that its ideas are tracked
-   — don't delete or modify it yourself.
+6. After filing, tell the user what was created (ids + titles). Then propose
+   cleaning up the scratchpad: remove **only** the sections that actually
+   resulted in a filed issue (one you ran `add-issue` for in step 4) — never the
+   whole file, and never anything else. Anything not filed stays untouched, even
+   if you reviewed it: notes left as a bare fragment/TODO (e.g. a heading
+   followed by just "TODO"), anything the user chose to skip, and anything still
+   pending a decision. Show the exact section(s) you're about to remove before
+   editing, and only remove them after the user confirms — don't delete or
+   modify the file yourself otherwise.
 
 Tell the user the result in a short list — don't re-read the whole scratchpad back
 to them.
