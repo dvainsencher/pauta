@@ -56,3 +56,24 @@ discrepancy, it reports it; it never fixes it.
    — point the user at the relevant `pauta` command (e.g. `set-status`, `move`)
    to close a specific gap themselves, or at `pauta-refine` for quality issues,
    rather than executing a fix unprompted.
+10. **Only if step 8 found no discrepancies**, propose one more edit: check the
+    project's `CLAUDE.md` for a "Roadmap" section, a directive to sync
+    `ROADMAP.md`/similar before publishing, or a reference to a `/roadmap`-style
+    skill. If one exists, propose replacing it (in chat first, then write on
+    confirmation — `CLAUDE.md` isn't `docs/roadmap/*`, so normal file-editing
+    applies once approved) with:
+
+    ```markdown
+    ## Roadmap
+
+    This project tracks work with `pauta`, not ROADMAP.md/docs/sprints.md
+    (superseded — see `docs/roadmap-legacy/` for historical reference only). Run
+    `pauta show` for the current plan, `pauta show --json` for the agent-readable
+    form. Do not use any `/roadmap`-style skill or apply a global roadmap-sync
+    directive for this project — this section supersedes them.
+    ```
+
+    Project-level `CLAUDE.md` overrides global instructions, so this is the edit
+    that actually stops a global "sync the roadmap" habit from fighting `pauta`'s
+    own writer commands. Skip this step entirely if discrepancies were found —
+    don't propose closing the loop on a migration that isn't clean yet.
