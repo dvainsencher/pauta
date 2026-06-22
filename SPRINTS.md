@@ -15,9 +15,12 @@ These are real ideas we discussed and chose *not* to schedule yet. They live in 
 #102  idea   "Feature helper" mode — discuss/extract features from a project (explicitly out of scope for now; scope creep risk)
 #104  done   Decide raw-file readability: resolved — JSONL/JSON only, not hand-readable; `show` is the only human-facing view (see CLAUDE.md)
 #109  note   AskUserQuestion (or any structured clarifying-question UI) has no equivalent in most other agentic tools (Cursor/Aider/Windsurf just ask inline in chat) — any pauta skill that asks clarifying questions should degrade to plain chat prompts, not assume a structured widget exists; applies to #108 below.
+#119  idea   Issue split/merge/parent-child relationships — no CLI/domain primitive exists today (confirmed during #122's design); "split this issue" or "merge these two" currently means manual remove-issue + add-issue + spec-content copy, with no traceability between the old and new ids. Surfaced by pauta-po (#122), explicitly deferred rather than approximated.
+#120  idea   Staleness queries — Issue/Sprint already store createdAt/updatedAt and they're exposed in `show --json`, but nothing filters/sorts on them; a "what's gone stale" PO behavior would have to compute this itself with no existing helper. Surfaced by pauta-po (#122), explicitly deferred.
+#121  idea   Issue-level prioritization — only Sprint has a `position` field; issues within a sprint sort by id/creation order only, with no deliberate priority. "What should I work on next" can't answer this from data alone today. Surfaced by pauta-po (#122), explicitly deferred.
 ```
 
-#103, #105-#108 scheduled below (see `install-skills-polish` and `issue-quality` sprints). #111-#118 (below, `migration-tooling` sprint) came out of a full real-world migration dry run (a disposable sandbox copy of an active project, never the live repo) using pauta-add-issue/-reorganize/-suggest-batches/-scratchpad-import as the executing skills.
+#103, #105-#108 scheduled below (see `install-skills-polish` and `issue-quality` sprints). #111-#118 (below, `migration-tooling` sprint) came out of a full real-world migration dry run (a disposable sandbox copy of an active project, never the live repo) using pauta-add-issue/-reorganize/-suggest-batches/-scratchpad-import as the executing skills. #119-#121 are gaps pauta-po (#122, below) surfaced but explicitly didn't build.
 
 ---
 
@@ -139,7 +142,7 @@ Design decisions: the trigger for #108/#110 is a heuristic (title length / vague
 
 ---
 
-## SPRINT migration-tooling   (position 70)
+## ✅ SPRINT migration-tooling   (position 70)
 
 **goal:** turn the dry-run-validated but unauditable manual migration playbook (164 issues filed, 23 sprints created, behind a handful of "ok proceed" approvals) into something a human can actually review before *and* after it runs. Three deliberately separate actions, not one bundled step: `migrate` (mechanical, writes a reviewable artifact, never resolves ambiguity), `audit` (mechanical fidelity check against that artifact), and `refine` (already built — quality/duplicate judgment calls, run explicitly and separately, never silently bundled into migration).
 
@@ -155,6 +158,16 @@ Design decisions: the trigger for #108/#110 is a heuristic (title length / vague
 ```
 
 Design decision: three actions (migrate / audit / refine), not two — fidelity-checking the migration itself ("did everything make it across, unmodified from the artifact") is a different, more mechanical question than quality-refining the result ("is this a good title, is this a duplicate"), and conflating them was part of how #118's mistake happened unnoticed until the user asked to see the artifact.
+
+---
+
+## ✅ SPRINT po-persona   (position 80)
+
+**goal:** a single conversational entry point ("PO, let's plan the backlog") that routes natural requests to the right existing skill, instead of requiring the user to know which of 8 files to invoke. Persona and mechanism are different layers: this adds a router/voice on top, it never collapses migrate/audit/refine's separate approval gates back into one bundled step.
+
+```
+#122  done   New pauta-po skill (skills/pauta-po/SKILL.md) — conversational front door over the other 8 skills. Description leads with distinctive multi-word trigger phrases ("PO, let's plan the backlog", "PO, where are we", ...), bare "PO" only as a weaker secondary cue, to avoid false-triggering on unrelated chat. Encodes 8 standing principles (re-read before reasoning, state intent before acting, never guess at ambiguity, name the cost of irreversible actions, rigor scales with consequence, sprints are context batches not time boxes, migrate/audit/refine stay three actions under the hood, the artifact outranks the chat) plus a routing table mapping intent → skill. Adds one new packaging behavior — a migrate→audit→refine chaining recipe for "review quality during migration" framing — and, only after a clean audit, one proactive (single, non-repeating) nudge to run refine over freshly-`ready` issues before a sprint starts. Explicitly says "pauta doesn't support that yet" for split/merge, staleness, and prioritization (#119-#121) rather than approximating them. Also wires the "rigor scales with consequence" principle into pauta-add-issue: filing directly with `--status ready` now runs refine's full check (clarity+consistency+spec quality), not just the clarity subset already run for `idea`. No CLI/code changes — skill content only, like #111/#115-#118.
+```
 
 ---
 
