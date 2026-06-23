@@ -3,7 +3,9 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { addIssue } from "./addIssue.js";
+import { createSprint } from "./createSprint.js";
 import { init } from "./init.js";
+import { move } from "./move.js";
 import { show } from "./show.js";
 
 describe("show", () => {
@@ -48,11 +50,18 @@ describe("show", () => {
       expect(out).not.toContain("Third issue");
     });
 
-    it("includes sprint assignment in pretty output", () => {
-      const issueId = addIssue(cwd, "Sprint issue");
-      // backlog issue has no sprint
+    it("shows 'backlog' for an issue not in any sprint", () => {
+      const issueId = addIssue(cwd, "Backlog issue");
       const out = show(cwd, { id: issueId });
       expect(out).toContain("backlog");
+    });
+
+    it("shows the sprint name for an issue assigned to a sprint", () => {
+      createSprint(cwd, "my-sprint", { goal: "test" });
+      const issueId = addIssue(cwd, "Sprint issue");
+      move(cwd, issueId, "my-sprint");
+      const out = show(cwd, { id: issueId });
+      expect(out).toContain("sprint: my-sprint");
     });
 
     it("returns just the issue as JSON when json: true", () => {
