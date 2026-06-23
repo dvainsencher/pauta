@@ -1,13 +1,13 @@
 ---
-name: pauta-bootstrap
-description: This skill should be used right after `npx pauta init` on a project that has no backlog issues yet, to seed an initial plan — phrases like "bootstrap the roadmap", "set up an initial backlog from this codebase", "start the plan from what we have", "this project is brand new, help me seed the backlog", "migrate my old backlog into pauta", or "port this ROADMAP.md/TODO.md".
+name: scrummy-bootstrap
+description: This skill should be used right after `npx scrummy init` on a project that has no backlog issues yet, to seed an initial plan — phrases like "bootstrap the roadmap", "set up an initial backlog from this codebase", "start the plan from what we have", "this project is brand new, help me seed the backlog", "migrate my old backlog into scrummy", or "port this ROADMAP.md/TODO.md".
 ---
 
-# pauta: bootstrap
+# scrummy: bootstrap
 
-This project tracks work with `pauta`, a flat-file backlog/sprint manager. The one
-rule that matters: **the `pauta` CLI is the only writer to `docs/roadmap/*`.** You
-read the plan via `npx pauta show --json` and you write to it only by calling `pauta`
+This project tracks work with `scrummy`, a flat-file backlog/sprint manager. The one
+rule that matters: **the `scrummy` CLI is the only writer to `docs/roadmap/*`.** You
+read the plan via `npx scrummy show --json` and you write to it only by calling `scrummy`
 commands — never by editing `docs/roadmap/issues.jsonl`, `docs/roadmap/sprints.json`,
 or `docs/roadmap/specs/*.md` directly.
 
@@ -18,7 +18,7 @@ one you're in before reading further:
   hand-rolled doc — `ROADMAP.md`, `docs/sprints.md`, a non-numeric
   `docs/roadmap/*.md`, `TODO.md`, or similar. This isn't "inspiration for a
   curated subset" — it's a full-fidelity port. See step 0 below; this case hands
-  off to `pauta-migrate` instead of following the rest of this skill.
+  off to `scrummy-migrate` instead of following the rest of this skill.
 - **Existing codebase**: there's code to read, not just intent, and no
   pre-existing backlog doc.
 - **Greenfield**: no code yet, or docs-only — there's nothing to scan beyond
@@ -27,12 +27,12 @@ one you're in before reading further:
 ## Steps
 
 0. **Check for a legacy backlog doc before anything else** — `ROADMAP.md`,
-   `docs/sprints.md`, a `docs/roadmap/*.md` that isn't pauta's own
+   `docs/sprints.md`, a `docs/roadmap/*.md` that isn't scrummy's own
    `issues.jsonl`/`sprints.json`/`specs/`, `TODO.md`, or similar. If you find one,
-   stop following these steps and follow `pauta-migrate`'s `SKILL.md` instead —
-   it handles the `docs/roadmap/` rename-first step (required before `npx pauta init`
+   stop following these steps and follow `scrummy-migrate`'s `SKILL.md` instead —
+   it handles the `docs/roadmap/` rename-first step (required before `npx scrummy init`
    if the legacy doc lives there) and the rest of the migration. Don't run
-   `npx pauta init` yourself first in this case; `pauta-migrate` does it after the
+   `npx scrummy init` yourself first in this case; `scrummy-migrate` does it after the
    rename.
 
    While you're here, also check the project's `CLAUDE.md` (and watch for
@@ -40,13 +40,13 @@ one you're in before reading further:
    sync `ROADMAP.md` before every PR) for a "Roadmap" section, a directive to
    mark `ROADMAP.md`/similar items done before publishing, or a custom
    `/roadmap`-style skill — any of these will keep firing after migration and
-   fight pauta's CLI-only-writer rule. If you find one, flag it to the user now,
-   even though the actual fix (replacing it with the pauta-pointer block) only
-   gets *proposed* once `pauta-audit` confirms the migration is clean — don't
+   fight scrummy's CLI-only-writer rule. If you find one, flag it to the user now,
+   even though the actual fix (replacing it with the scrummy-pointer block) only
+   gets *proposed* once `scrummy-audit` confirms the migration is clean — don't
    wait for the user to stumble onto the conflict on their own.
-1. Run `npx pauta show --json` first regardless of case — if it already has issues or
-   sprints, this isn't a bootstrap anymore; stop and suggest `pauta-suggest-batches`
-   or `pauta-add-issue` instead.
+1. Run `npx scrummy show --json` first regardless of case — if it already has issues or
+   sprints, this isn't a bootstrap anymore; stop and suggest `scrummy-suggest-batches`
+   or `scrummy-add-issue` instead.
 2. Gather source material for the proposal:
    - **Existing codebase**: read the README, any design docs, and skim the source
      tree structure (directories, major modules, existing TODO/FIXME markers) to
@@ -62,13 +62,13 @@ one you're in before reading further:
 4. **Propose the plan in chat before acting** — list each sprint (name, goal) with
    its issues (title, status), and the ungrouped backlog issues. This is the
    project's first plan; don't execute silently.
-5. Once the user confirms (or edits the proposal), execute via `pauta` commands
+5. Once the user confirms (or edits the proposal), execute via `scrummy` commands
    only, in this order:
-   - `npx pauta create-sprint <name> --goal "..." [--position <n>]` for each sprint
-   - `npx pauta add-issue "<title>" [--status idea|ready] [--sprint <name>]` for each
+   - `npx scrummy create-sprint <name> --goal "..." [--position <n>]` for each sprint
+   - `npx scrummy add-issue "<title>" [--status idea|ready] [--sprint <name>]` for each
      issue — pass `--sprint` directly for issues going into a sprint you just
      created, or omit it for backlog issues
-   - `npx pauta set-active <name>` if the user wants to mark one sprint as current
+   - `npx scrummy set-active <name>` if the user wants to mark one sprint as current
 
-After executing, point the user at `npx pauta show` to see the result — don't
+After executing, point the user at `npx scrummy show` to see the result — don't
 re-print the whole plan yourself.

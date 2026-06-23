@@ -8,7 +8,7 @@ describe("buildUsageText", () => {
     const descriptions = { a: "does a", b: "does b" };
     const text = buildUsageText(commands, descriptions);
     const lines = text.split("\n");
-    expect(lines[0]).toBe("Usage: pauta <command> [args]");
+    expect(lines[0]).toBe("Usage: scrummy <command> [args]");
     expect(lines.findIndex((l) => l.includes("a"))).toBeLessThan(
       lines.findIndex((l) => l.includes("b")),
     );

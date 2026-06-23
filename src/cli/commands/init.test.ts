@@ -11,7 +11,7 @@ describe("init", () => {
   let cwd: string;
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-"));
   });
 
   afterEach(() => {
@@ -46,7 +46,7 @@ describe("init", () => {
     expect(fs.readFileSync(issuesFilePath(cwd), "utf8")).toContain('"id":1');
   });
 
-  it("refuses to init when docs/roadmap/ already exists with non-pauta content", () => {
+  it("refuses to init when docs/roadmap/ already exists with non-scrummy content", () => {
     fs.mkdirSync(path.join(cwd, "docs", "roadmap"), { recursive: true });
     fs.writeFileSync(path.join(cwd, "docs", "roadmap", "ROADMAP.md"), "# legacy backlog\n");
     expect(() => init(cwd)).toThrow(/docs\/roadmap-legacy/);

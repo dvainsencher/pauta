@@ -1,4 +1,4 @@
-# pauta
+# scrummy
 
 A flat-file backlog and sprint manager, driven identically by a human at a terminal
 and by Claude Code over the same files. See `README.md` for the full design and
@@ -16,15 +16,15 @@ through the CLI.
 ## Decisions (resolved open questions)
 
 - **Language/runtime**: Node/TypeScript.
-- **CLI command name**: `pauta` (the README's "roadmap" is the working name from the
-  original design doc — the project and command are both `pauta`).
+- **CLI command name**: `scrummy` (the README's "roadmap" is the working name from the
+  original design doc — the project and command are both `scrummy`).
 - **On-disk format**: JSONL (`issues.jsonl`) + JSON (`sprints.json`) only. The raw files
-  are not meant to be human-readable on their own — `pauta show` is the only
+  are not meant to be human-readable on their own — `scrummy show` is the only
   human-facing view. This resolves README's open decision and backlog issue #104.
-- **Distribution**: per-project install only (no global mode). `pauta init` scaffolds
+- **Distribution**: per-project install only (no global mode). `scrummy init` scaffolds
   `docs/roadmap/` inside each project; CLI and skill files are installed per-project.
 
 ## Status
 
 Greenfield — no code yet. Current build plan lives in `SPRINTS.md`; sprint
-`foundation` (position 10) is first, starting with `#0 pauta init`.
+`foundation` (position 10) is first, starting with `#0 scrummy init`.

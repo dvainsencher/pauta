@@ -113,7 +113,7 @@ describe("assertSprintStatus", () => {
 
 describe("assertDirectoryExists", () => {
   it("does not throw for an existing directory", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-dir-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-dir-"));
     try {
       expect(() => assertDirectoryExists(dir, "Some directory")).not.toThrow();
     } finally {
@@ -128,7 +128,7 @@ describe("assertDirectoryExists", () => {
   });
 
   it("throws when the path is not a directory", () => {
-    const file = path.join(os.tmpdir(), `pauta-test-file-${Date.now()}`);
+    const file = path.join(os.tmpdir(), `scrummy-test-file-${Date.now()}`);
     fs.writeFileSync(file, "x");
     try {
       expect(() => assertDirectoryExists(file, "Some directory")).toThrow(
@@ -144,7 +144,7 @@ describe("assertRoadmapDirNotForeign", () => {
   let dir: string;
 
   beforeEach(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-roadmap-"));
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-roadmap-"));
   });
 
   afterEach(() => {
@@ -160,14 +160,14 @@ describe("assertRoadmapDirNotForeign", () => {
     expect(() => assertRoadmapDirNotForeign(dir)).not.toThrow();
   });
 
-  it("does not throw when only pauta-owned entries exist (issues.jsonl, sprints.json, specs)", () => {
+  it("does not throw when only scrummy-owned entries exist (issues.jsonl, sprints.json, specs)", () => {
     fs.writeFileSync(path.join(dir, "issues.jsonl"), "");
     fs.writeFileSync(path.join(dir, "sprints.json"), "[]\n");
     fs.mkdirSync(path.join(dir, "specs"));
     expect(() => assertRoadmapDirNotForeign(dir)).not.toThrow();
   });
 
-  it("does not throw when only a partial pauta init left specs/ behind (no issues.jsonl yet)", () => {
+  it("does not throw when only a partial scrummy init left specs/ behind (no issues.jsonl yet)", () => {
     fs.mkdirSync(path.join(dir, "specs"));
     expect(() => assertRoadmapDirNotForeign(dir)).not.toThrow();
   });

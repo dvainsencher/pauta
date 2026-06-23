@@ -1,4 +1,4 @@
-# pauta
+# scrummy
 
 A flat-file backlog and sprint manager for solo developers and small teams — built to be driven both by a human at a terminal and by a coding agent (e.g. Claude Code) over the **same files**.
 
@@ -30,7 +30,7 @@ The atom of work. An issue has:
 | `status` | `idea → ready → doing → done` (lifecycle only) |
 | `sprint` | a sprint name, or empty |
 | spec | optional file at `specs/<id>.md` for detailed write-ups |
-| progress log | optional append-only entries in `progress.jsonl`, for resuming a long-running issue across sessions — see `pauta log-issue`/`pauta show-log` below |
+| progress log | optional append-only entries in `progress.jsonl`, for resuming a long-running issue across sessions — see `scrummy log-issue`/`scrummy show-log` below |
 
 **Empty `sprint` = the backlog.** The backlog is just every issue not assigned to a sprint — a real inbox for raw ideas.
 
@@ -94,40 +94,40 @@ docs/roadmap/
 ```
 
 > **Resolved** (see `CLAUDE.md`): JSON Lines, not meant to be human-readable on its
-> own — `pauta show` is the only human-facing view.
+> own — `scrummy show` is the only human-facing view.
 
 ---
 
 ## Command surface
 
-`pauta` (bare) or `pauta --help` prints this command list with one-line
+`scrummy` (bare) or `scrummy --help` prints this command list with one-line
 descriptions; an unknown command prints an error hinting at `--help`.
 
 ### Writers (mechanical · zero tokens · the only mutators)
 
 ```
-pauta init                                 # scaffold docs/roadmap/ in a project (empty issues, sprints, specs/)
+scrummy init                                 # scaffold docs/roadmap/ in a project (empty issues, sprints, specs/)
 
-pauta add-issue "<title>" [--status idea|ready] [--sprint <name>]   # prints new id
-pauta edit-issue <id> [--title "..."] [--status ...]
-pauta remove-issue <id>
-pauta import <file>                        # batch-add issues from a JSON array of {title, status?, sprint?}; prints new ids, one per line
-pauta move <id> <sprint-name>              # assign to a sprint
-pauta move <id> --backlog                  # send back to the inbox
-pauta set-status <id> <status>
+scrummy add-issue "<title>" [--status idea|ready] [--sprint <name>]   # prints new id
+scrummy edit-issue <id> [--title "..."] [--status ...]
+scrummy remove-issue <id>
+scrummy import <file>                        # batch-add issues from a JSON array of {title, status?, sprint?}; prints new ids, one per line
+scrummy move <id> <sprint-name>              # assign to a sprint
+scrummy move <id> --backlog                  # send back to the inbox
+scrummy set-status <id> <status>
 
-pauta create-sprint <name> --goal "..." [--notes "..."] [--position <n>]
-pauta edit-sprint <name> [--goal "..."] [--notes "..."]
-pauta remove-sprint <name>                 # only if empty — move issues out first
-pauta set-position <name> <n>              # advisory sort only
-pauta set-active <name>                    # mark which sprint you're working on
-pauta set-sprint-status <name> <planned|active|done>
+scrummy create-sprint <name> --goal "..." [--notes "..."] [--position <n>]
+scrummy edit-sprint <name> [--goal "..."] [--notes "..."]
+scrummy remove-sprint <name>                 # only if empty — move issues out first
+scrummy set-position <name> <n>              # advisory sort only
+scrummy set-active <name>                    # mark which sprint you're working on
+scrummy set-sprint-status <name> <planned|active|done>
 
-pauta spec <id>                            # create/return path to specs/<id>.md
+scrummy spec <id>                            # create/return path to specs/<id>.md
 
-pauta log-issue <id> --type plan|verified|pending "<message>"   # append a progress-log entry for the issue
+scrummy log-issue <id> --type plan|verified|pending "<message>"   # append a progress-log entry for the issue
 
-pauta install-skills                       # copy the Claude Code skill files into .claude/skills/
+scrummy install-skills                       # copy the Claude Code skill files into .claude/skills/
 ```
 
 All of the above are implemented (`SPRINTS.md`'s `foundation` and `agent-skills` sprints).
@@ -139,10 +139,10 @@ sprints are hidden — `--done` reveals them. `--sprint <name>` shows only that
 sprint's issues and omits the backlog section.
 
 ```
-pauta show [--sprint <name>] [--done]      # the human-scannable whole plan
-pauta show --json                          # same content, structured, for the agent
-pauta show-log <id>                        # the progress-log entries for one issue, structured, for the agent
-pauta status                               # one-line summary of the active sprint, e.g. for a shell statusline
+scrummy show [--sprint <name>] [--done]      # the human-scannable whole plan
+scrummy show --json                          # same content, structured, for the agent
+scrummy show-log <id>                        # the progress-log entries for one issue, structured, for the agent
+scrummy status                               # one-line summary of the active sprint, e.g. for a shell statusline
 ```
 
 Default `show` output:
@@ -169,51 +169,51 @@ BACKLOG (4)
 The pretty view and the `--json` view render from the same data, so they can't disagree.
 
 `hasSpec`/`hasLog` (the `[spec]`/`[log]` tags above) tell an agent whether an issue
-has a spec file or progress-log entries worth reading before acting — `pauta spec
-<id>` / `pauta show-log <id>` for the content itself.
+has a spec file or progress-log entries worth reading before acting — `scrummy spec
+<id>` / `scrummy show-log <id>` for the content itself.
 
 ### Smart ops (use an LLM · cost tokens · invoked deliberately)
 
-These are Claude Code skills, not `pauta` subcommands — `pauta` itself never calls
-an LLM. The skill reads via `pauta show --json`, reasons, proposes the plan in
+These are Claude Code skills, not `scrummy` subcommands — `scrummy` itself never calls
+an LLM. The skill reads via `scrummy show --json`, reasons, proposes the plan in
 chat, and on confirmation writes only via the same writer commands a human would
 type.
 
 ```
-pauta-po                     # skill: conversational front door — routes "PO, let's plan the backlog" etc. to the skills below
-pauta-suggest-batches        # skill: reads the backlog, proposes sprint groupings; you confirm
-pauta-bootstrap              # skill: reads repo code + docs, proposes an initial set of issues/sprints
-pauta-migrate                # skill: full-fidelity port of an existing hand-rolled backlog doc, via a reviewable file artifact
-pauta-audit                  # skill: read-only fidelity check of a completed migration against its approved artifact
-pauta-scratchpad-import      # skill: reads a messy notes file, files one issue per idea; you confirm
-pauta-refine                 # skill: checks a candidate or existing issue for clarity/consistency/spec quality
+scrummy-po                     # skill: conversational front door — routes "PO, let's plan the backlog" etc. to the skills below
+scrummy-suggest-batches        # skill: reads the backlog, proposes sprint groupings; you confirm
+scrummy-bootstrap              # skill: reads repo code + docs, proposes an initial set of issues/sprints
+scrummy-migrate                # skill: full-fidelity port of an existing hand-rolled backlog doc, via a reviewable file artifact
+scrummy-audit                  # skill: read-only fidelity check of a completed migration against its approved artifact
+scrummy-scratchpad-import      # skill: reads a messy notes file, files one issue per idea; you confirm
+scrummy-refine                 # skill: checks a candidate or existing issue for clarity/consistency/spec quality
 ```
 
-`pauta-po` is a conversational front door over the other six — same propose-then-
+`scrummy-po` is a conversational front door over the other six — same propose-then-
 execute discipline as every other skill here, it just routes by intent ("let's plan
 the backlog," "where are we," "turn my notes into issues") instead of requiring you
 to know which skill to invoke. It never bundles migrate/audit/refine's separate
 approval gates into one step; it can chain them in one sitting (migrate → audit →
 an offer to run refine), but each gate still fires on its own.
 
-`pauta-bootstrap` works on an existing codebase *or* a greenfield project with only
+`scrummy-bootstrap` works on an existing codebase *or* a greenfield project with only
 docs (or nothing) — and detects a third case, an existing hand-rolled backlog doc
-(`ROADMAP.md`, `docs/sprints.md`, `TODO.md`, ...), handing off to `pauta-migrate`
-for that one. Unlike the other smart ops, `pauta-migrate` doesn't propose in chat —
+(`ROADMAP.md`, `docs/sprints.md`, `TODO.md`, ...), handing off to `scrummy-migrate`
+for that one. Unlike the other smart ops, `scrummy-migrate` doesn't propose in chat —
 it writes a markdown mapping table to `docs/roadmap-legacy/_migration-plan.md` for
 you to read and edit directly, and executes only the (possibly edited) file once
 you approve it; ambiguities (possible duplicates, thin notes, which sprint should
 be active) are flagged in the file, never silently resolved — that's
-`pauta-refine`'s job, run separately afterward. `pauta-audit` is the third leg of
-the same migration flow: run it after `pauta-migrate` to mechanically reconcile
+`scrummy-refine`'s job, run separately afterward. `scrummy-audit` is the third leg of
+the same migration flow: run it after `scrummy-migrate` to mechanically reconcile
 the resulting backlog against the approved artifact (every row produced an issue,
 counts match, nothing silently dropped) — a different question from "is this
-backlog any good," which is `pauta-refine`'s. `migrate`/`audit`/`refine` are three
+backlog any good," which is `scrummy-refine`'s. `migrate`/`audit`/`refine` are three
 separate, explicitly-invoked actions on purpose, never bundled into one step.
-`pauta-scratchpad-import` is for unstructured prose with no fixed shape — notes
-jotted for your own future reference, not an existing plan. `pauta-refine` doesn't
-file or move anything itself; `pauta-add-issue` and `pauta-scratchpad-import` both
-call it as a quality check before filing. `pauta-refine` also has an explicit
+`scrummy-scratchpad-import` is for unstructured prose with no fixed shape — notes
+jotted for your own future reference, not an existing plan. `scrummy-refine` doesn't
+file or move anything itself; `scrummy-add-issue` and `scrummy-scratchpad-import` both
+call it as a quality check before filing. `scrummy-refine` also has an explicit
 **batch mode** for running over a whole issue set at once (most commonly the
 issues a migration just created) — it asks up front whether you want findings one
 at a time or as a single batched list, and only acts on the decisions you actually
@@ -225,13 +225,13 @@ approve; nothing gets silently merged or edited.
 
 The same CLI is invoked two ways:
 
-- **By you, by hand** — `pauta add-issue "..."` at the terminal, or migrating a scratchpad note.
+- **By you, by hand** — `scrummy add-issue "..."` at the terminal, or migrating a scratchpad note.
 - **By an agent, via a Claude Code skill** — after a feature discussion, the agent reads `show --json`, reasons, and calls the writer commands. It never edits the files directly.
 
 The capture flows this supports:
 
 - **At the desk:** discuss with the agent → "add this and slot it" → agent emits the right commands.
-- **Away from the desk:** jot into a dumb scratchpad file → later run `add-issue` per note yourself, or hand the scratchpad to the agent and say "import these" (the `pauta-scratchpad-import` skill). The CLI is the single funnel every note passes through to become a real issue — so you never copy-paste into the roadmap files by hand.
+- **Away from the desk:** jot into a dumb scratchpad file → later run `add-issue` per note yourself, or hand the scratchpad to the agent and say "import these" (the `scrummy-scratchpad-import` skill). The CLI is the single funnel every note passes through to become a real issue — so you never copy-paste into the roadmap files by hand.
 
 An external inspector agent (looking at a project you're *not* actively coding in) is the same system pointed at the same files from outside — a deployment choice, not a separate architecture.
 
@@ -239,7 +239,7 @@ An external inspector agent (looking at a project you're *not* actively coding i
 
 ## Install & setup
 
-pauta isn't published to a registry yet, so a project depends on it as a
+scrummy isn't published to a registry yet, so a project depends on it as a
 `devDependency` pointed at this repo (git URL or a local path), the same way you'd
 depend on any unpublished package:
 
@@ -247,49 +247,49 @@ depend on any unpublished package:
 // package.json
 {
   "devDependencies": {
-    "pauta": "git+https://github.com/dvainsencher/pauta.git"
-    // or, for local development: "pauta": "file:../pauta"
+    "scrummy": "git+https://github.com/dvainsencher/pauta.git"
+    // or, for local development: "scrummy": "file:../pauta"
   }
 }
 ```
 
 ```
-npm install                # wires up node_modules/.bin/pauta
-npx pauta init              # scaffold docs/roadmap/ (empty issues, sprints, specs/)
-npx pauta install-skills    # copy the Claude Code skill files into .claude/skills/
+npm install                # wires up node_modules/.bin/scrummy
+npx scrummy init              # scaffold docs/roadmap/ (empty issues, sprints, specs/)
+npx scrummy install-skills    # copy the Claude Code skill files into .claude/skills/
 ```
 
 `install-skills` is mechanical (no LLM) — it copies every skill directory
-(`pauta-po`, `pauta-add-issue`, `pauta-reorganize`, `pauta-suggest-batches`, `pauta-bootstrap`,
-`pauta-migrate`, `pauta-audit`, `pauta-scratchpad-import`, `pauta-refine`) from the installed
+(`scrummy-po`, `scrummy-add-issue`, `scrummy-reorganize`, `scrummy-suggest-batches`, `scrummy-bootstrap`,
+`scrummy-migrate`, `scrummy-audit`, `scrummy-scratchpad-import`, `scrummy-refine`) from the installed
 package's own `skills/` directory into the project's `.claude/skills/`,
 overwriting on re-run. Once installed, the skills themselves enforce the one
-rule: read via `pauta show --json`, write only via `pauta` commands, never touch
+rule: read via `scrummy show --json`, write only via `scrummy` commands, never touch
 `docs/roadmap/*` directly.
 
 **Existing project:** `init`, then `install-skills`, then either add issues by hand
-(or via the `pauta-add-issue` skill during a feature discussion), or ask the agent
-to run the `pauta-bootstrap` skill to seed a starting plan from your existing code.
-**New project:** same — `init`, `install-skills`, then `pauta-bootstrap` from
+(or via the `scrummy-add-issue` skill during a feature discussion), or ask the agent
+to run the `scrummy-bootstrap` skill to seed a starting plan from your existing code.
+**New project:** same — `init`, `install-skills`, then `scrummy-bootstrap` from
 whatever docs exist (or start empty and add issues as ideas come up).
 
 **Already have a hand-rolled backlog?** (a legacy `ROADMAP.md`/`docs/sprints.md`/
 `TODO.md` setup, possibly living at `docs/roadmap/` itself) Run `install-skills`
-and ask the agent to bootstrap — `pauta-bootstrap` detects the legacy doc and hands
-off to `pauta-migrate`, which handles the `docs/roadmap/` rename
+and ask the agent to bootstrap — `scrummy-bootstrap` detects the legacy doc and hands
+off to `scrummy-migrate`, which handles the `docs/roadmap/` rename
 (`git mv docs/roadmap docs/roadmap-legacy` — required before `init`, since `init`
-refuses to run if that directory contains anything other than pauta's own files)
+refuses to run if that directory contains anything other than scrummy's own files)
 and writes a reviewable mapping artifact before filing anything. See "Smart ops"
-above for what `pauta-migrate` does and doesn't decide on its own.
+above for what `scrummy-migrate` does and doesn't decide on its own.
 
-`init`, the CLI, and `install-skills` are all mechanical (no LLM); `pauta-po` and
+`init`, the CLI, and `install-skills` are all mechanical (no LLM); `scrummy-po` and
 the other Claude Code skills read content and cost tokens.
 
 ---
 
-## Adopting pauta where a project already has its own backlog doc
+## Adopting scrummy where a project already has its own backlog doc
 
-Once `pauta-migrate` has ported a hand-rolled backlog and `pauta-audit` has
+Once `scrummy-migrate` has ported a hand-rolled backlog and `scrummy-audit` has
 confirmed nothing was dropped, the project's own `CLAUDE.md` almost always still
 points at the old doc — a "Roadmap" section, a directive to mark `ROADMAP.md`
 items done before opening a PR, or a custom `/roadmap`-style skill. Replace that
@@ -298,19 +298,19 @@ section with something like:
 ```markdown
 ## Roadmap
 
-This project tracks work with `pauta`, not ROADMAP.md/docs/sprints.md
+This project tracks work with `scrummy`, not ROADMAP.md/docs/sprints.md
 (superseded — see `docs/roadmap-legacy/` for historical reference only). Run
-`pauta show` for the current plan, `pauta show --json` for the agent-readable
+`scrummy show` for the current plan, `scrummy show --json` for the agent-readable
 form. Do not use any `/roadmap`-style skill or apply a global roadmap-sync
 directive for this project — this section supersedes them.
 ```
 
 Project-level `CLAUDE.md` instructions override global ones, so this section
 alone is enough to redirect any global "sync the roadmap before publishing"
-habit toward `pauta`'s own writer commands instead. `pauta-migrate` proposes this
+habit toward `scrummy`'s own writer commands instead. `scrummy-migrate` proposes this
 edit itself once a migration is confirmed clean — see its `SKILL.md` — but it's
 documented here too since it's also the right edit for a project moving off a
-backlog doc by hand, without running `pauta-migrate` at all.
+backlog doc by hand, without running `scrummy-migrate` at all.
 
 ---
 
@@ -318,12 +318,12 @@ backlog doc by hand, without running `pauta-migrate` at all.
 
 `foundation`, `the-reader`, `agent-skills`, `smart-ops`, `install-skills-polish`,
 and `issue-quality` sprints are done — the whole mechanical layer, `show`/
-`show --json`, and the Claude Code skills (including `pauta-suggest-batches`,
-`pauta-bootstrap`, `pauta-scratchpad-import`, and `pauta-refine`) that drive it.
+`show --json`, and the Claude Code skills (including `scrummy-suggest-batches`,
+`scrummy-bootstrap`, `scrummy-scratchpad-import`, and `scrummy-refine`) that drive it.
 
 A second pass of CLI polish is also done (#124–#128): all mutating commands now
-print a confirmation string on success, `pauta --help` and bare `pauta` print a
-command list, skill files use `npx pauta` so they work regardless of PATH, `pauta
+print a confirmation string on success, `scrummy --help` and bare `scrummy` print a
+command list, skill files use `npx scrummy` so they work regardless of PATH, `scrummy
 show <id>` renders a single issue, and sprint-name mismatches include a "Did you
 mean?" suggestion.
 

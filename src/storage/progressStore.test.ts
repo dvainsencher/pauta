@@ -10,7 +10,7 @@ describe("progressStore", () => {
   let cwd: string;
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-"));
     fs.mkdirSync(roadmapDir(cwd), { recursive: true });
   });
 
