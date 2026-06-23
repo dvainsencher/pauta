@@ -36,4 +36,35 @@ describe("show", () => {
     addIssue(cwd, "Dark mode");
     expect(() => show(cwd, { sprint: "missing" })).toThrow(/missing/);
   });
+
+  describe("show with id", () => {
+    it("returns just the matching issue in pretty format", () => {
+      addIssue(cwd, "First issue");
+      const id = addIssue(cwd, "Target issue");
+      addIssue(cwd, "Third issue");
+      const out = show(cwd, { id });
+      expect(out).toContain("Target issue");
+      expect(out).not.toContain("First issue");
+      expect(out).not.toContain("Third issue");
+    });
+
+    it("includes sprint assignment in pretty output", () => {
+      const issueId = addIssue(cwd, "Sprint issue");
+      // backlog issue has no sprint
+      const out = show(cwd, { id: issueId });
+      expect(out).toContain("backlog");
+    });
+
+    it("returns just the issue as JSON when json: true", () => {
+      const id = addIssue(cwd, "JSON target");
+      const out = show(cwd, { id, json: true });
+      const parsed = JSON.parse(out);
+      expect(parsed.title).toBe("JSON target");
+      expect(parsed.id).toBe(id);
+    });
+
+    it("throws when the issue does not exist", () => {
+      expect(() => show(cwd, { id: 999 })).toThrow(/999/);
+    });
+  });
 });

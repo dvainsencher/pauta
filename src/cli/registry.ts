@@ -142,7 +142,10 @@ export const commands: Record<string, CommandHandler> = {
 
   show: (cwd, args) => {
     const parsed = parseArgs(args);
+    const rawId = parsed.positionals[0];
+    const id = rawId !== undefined ? parseInt(rawId, 10) : undefined;
     return show(cwd, {
+      id: id !== undefined && !isNaN(id) ? id : undefined,
       sprint: parsed.flags.sprint as string | undefined,
       done: parsed.flags.done === true,
       json: parsed.flags.json === true,
