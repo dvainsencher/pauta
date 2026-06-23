@@ -1,18 +1,18 @@
 {
-  "name": "pauta",
+  "name": "scrummy",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "pauta": "./dist/bin/pauta.js"
+    "scrummy": "./dist/bin/scrummy.js"
   },
   "main": "./dist/index.js",
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc -p tsconfig.json && chmod +x dist/bin/pauta.js",
+    "build": "tsc -p tsconfig.json && chmod +x dist/bin/scrummy.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev": "tsx src/bin/pauta.ts",
+    "dev": "tsx src/bin/scrummy.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

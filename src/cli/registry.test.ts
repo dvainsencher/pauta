@@ -10,7 +10,7 @@ describe("command registry", () => {
   let cwd: string;
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-"));
   });
 
   afterEach(() => {
@@ -115,10 +115,10 @@ describe("command registry", () => {
   it("install-skills copies the shipped skills into .claude/skills/", () => {
     commands["install-skills"](cwd, []);
     expect(
-      fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-add-issue", "SKILL.md")),
+      fs.existsSync(path.join(cwd, ".claude", "skills", "scrummy-add-issue", "SKILL.md")),
     ).toBe(true);
     expect(
-      fs.existsSync(path.join(cwd, ".claude", "skills", "pauta-reorganize", "SKILL.md")),
+      fs.existsSync(path.join(cwd, ".claude", "skills", "scrummy-reorganize", "SKILL.md")),
     ).toBe(true);
   });
 });

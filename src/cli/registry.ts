@@ -185,6 +185,6 @@ export const commandDescriptions: Record<string, string> = {
   "log-issue": "Append a progress log entry to an issue",
   "show-log": "Show an issue's progress log",
   show: "Show the backlog and sprints",
-  "install-skills": "Install pauta's Claude Code skills into this project",
+  "install-skills": "Install scrummy's Claude Code skills into this project",
   status: "Print a one-line summary of the active sprint",
 };

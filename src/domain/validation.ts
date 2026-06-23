@@ -106,18 +106,18 @@ export function assertDirectoryExists(dirPath: string, label: string): void {
   }
 }
 
-const PAUTA_OWNED_ROADMAP_ENTRIES = new Set(["issues.jsonl", "sprints.json", "progress.jsonl", "specs"]);
+const SCRUMMY_OWNED_ROADMAP_ENTRIES = new Set(["issues.jsonl", "sprints.json", "progress.jsonl", "specs"]);
 
 export function assertRoadmapDirNotForeign(roadmapDir: string): void {
   if (!existsSync(roadmapDir)) {
     return;
   }
   const foreignEntries = readdirSync(roadmapDir).filter(
-    (entry) => !entry.startsWith(".") && !PAUTA_OWNED_ROADMAP_ENTRIES.has(entry),
+    (entry) => !entry.startsWith(".") && !SCRUMMY_OWNED_ROADMAP_ENTRIES.has(entry),
   );
   if (foreignEntries.length > 0) {
     throw new Error(
-      `"${roadmapDir}" already exists and contains non-pauta content (${foreignEntries.join(", ")}). ` +
+      `"${roadmapDir}" already exists and contains non-scrummy content (${foreignEntries.join(", ")}). ` +
         `Move it out of the way first, e.g. "git mv docs/roadmap docs/roadmap-legacy", then run init again.`,
     );
   }

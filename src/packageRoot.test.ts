@@ -15,6 +15,6 @@ describe("skillsSourceDir", () => {
   });
 
   it("points at a directory that actually contains the shipped skills", () => {
-    expect(fs.existsSync(path.join(skillsSourceDir(), "pauta-add-issue", "SKILL.md"))).toBe(true);
+    expect(fs.existsSync(path.join(skillsSourceDir(), "scrummy-add-issue", "SKILL.md"))).toBe(true);
   });
 });

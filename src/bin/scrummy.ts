@@ -33,7 +33,7 @@ export function main(io: MainIO): number {
   const handler = commands[commandName];
   if (!handler) {
     io.stderr(`Unknown command: ${commandName}\n`);
-    io.stderr(`Run "pauta --help" for a list of commands.\n`);
+    io.stderr(`Run "scrummy --help" for a list of commands.\n`);
     return 1;
   }
 

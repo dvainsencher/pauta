@@ -12,7 +12,7 @@ describe("importFromFile", () => {
   let filePath: string;
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-"));
     init(cwd);
     filePath = path.join(cwd, "import.json");
   });

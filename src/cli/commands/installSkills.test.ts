@@ -10,8 +10,8 @@ describe("installSkills", () => {
   let sourceDir: string;
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-cwd-"));
-    sourceDir = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-skills-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-cwd-"));
+    sourceDir = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-skills-"));
   });
 
   afterEach(() => {
@@ -26,45 +26,45 @@ describe("installSkills", () => {
   }
 
   it("copies a skill directory into .claude/skills/<name>", () => {
-    writeSkill("pauta-add-issue", "# add issue\n");
+    writeSkill("scrummy-add-issue", "# add issue\n");
     installSkills(cwd, sourceDir);
     const installed = fs.readFileSync(
-      path.join(cwd, ".claude", "skills", "pauta-add-issue", "SKILL.md"),
+      path.join(cwd, ".claude", "skills", "scrummy-add-issue", "SKILL.md"),
       "utf8",
     );
     expect(installed).toBe("# add issue\n");
   });
 
   it("copies every skill subdirectory", () => {
-    writeSkill("pauta-add-issue", "# a\n");
-    writeSkill("pauta-reorganize", "# b\n");
+    writeSkill("scrummy-add-issue", "# a\n");
+    writeSkill("scrummy-reorganize", "# b\n");
     installSkills(cwd, sourceDir);
     expect(fs.readdirSync(path.join(cwd, ".claude", "skills")).sort()).toEqual([
-      "pauta-add-issue",
-      "pauta-reorganize",
+      "scrummy-add-issue",
+      "scrummy-reorganize",
     ]);
   });
 
   it("returns the names of the skills installed", () => {
-    writeSkill("pauta-add-issue", "# a\n");
-    writeSkill("pauta-reorganize", "# b\n");
-    expect(installSkills(cwd, sourceDir).sort()).toEqual(["pauta-add-issue", "pauta-reorganize"]);
+    writeSkill("scrummy-add-issue", "# a\n");
+    writeSkill("scrummy-reorganize", "# b\n");
+    expect(installSkills(cwd, sourceDir).sort()).toEqual(["scrummy-add-issue", "scrummy-reorganize"]);
   });
 
   it("overwrites stale content from a previous install", () => {
-    writeSkill("pauta-add-issue", "# old\n");
+    writeSkill("scrummy-add-issue", "# old\n");
     installSkills(cwd, sourceDir);
-    fs.writeFileSync(path.join(sourceDir, "pauta-add-issue", "SKILL.md"), "# new\n");
+    fs.writeFileSync(path.join(sourceDir, "scrummy-add-issue", "SKILL.md"), "# new\n");
     installSkills(cwd, sourceDir);
     const installed = fs.readFileSync(
-      path.join(cwd, ".claude", "skills", "pauta-add-issue", "SKILL.md"),
+      path.join(cwd, ".claude", "skills", "scrummy-add-issue", "SKILL.md"),
       "utf8",
     );
     expect(installed).toBe("# new\n");
   });
 
   it("creates .claude/skills even if .claude doesn't exist yet", () => {
-    writeSkill("pauta-add-issue", "# a\n");
+    writeSkill("scrummy-add-issue", "# a\n");
     installSkills(cwd, sourceDir);
     expect(fs.statSync(path.join(cwd, ".claude", "skills")).isDirectory()).toBe(true);
   });
@@ -78,7 +78,7 @@ describe("installSkills", () => {
 });
 
 describe("skill source files", () => {
-  it("every SKILL.md uses npx pauta <cmd>, not bare pauta <cmd>", () => {
+  it("every SKILL.md uses npx scrummy <cmd>, not bare scrummy <cmd>", () => {
     const src = skillsSourceDir();
     const skillDirs = fs.readdirSync(src);
     const violations: string[] = [];
@@ -87,12 +87,12 @@ describe("skill source files", () => {
       if (!fs.existsSync(skillFile)) continue;
       const content = fs.readFileSync(skillFile, "utf8");
       // Two bad patterns:
-      // 1. `pauta <cmd>` — has pauta prefix but missing npx
-      // 2. `<known-subcommand> <args>` — subcommand invocation (with args) missing pauta prefix entirely
+      // 1. `scrummy <cmd>` — has scrummy prefix but missing npx
+      // 2. `<known-subcommand> <args>` — subcommand invocation (with args) missing scrummy prefix entirely
       // Prose references like "the `add-issue` command" (subcommand + closing backtick) are fine.
       const SUBCOMMANDS =
         "show|add-issue|edit-issue|remove-issue|create-sprint|edit-sprint|remove-sprint|move|set-status|set-sprint-status|set-active|set-position|spec|log-issue|show-log|import|init|install-skills";
-      const bareWithPauta = content.match(/`pauta [a-z]/g) ?? [];
+      const bareWithPauta = content.match(/`scrummy [a-z]/g) ?? [];
       // Only flag when followed by space+args (not closing backtick — that's just a name reference)
       const bareSubcommand = content.match(new RegExp(`\`(?:${SUBCOMMANDS}) `, "g")) ?? [];
       const bareInvocations = [...bareWithPauta, ...bareSubcommand];

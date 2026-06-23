@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { isEntryPoint, main } from "./pauta.js";
+import { isEntryPoint, main } from "./scrummy.js";
 
 describe("main", () => {
   let cwd: string;
@@ -11,7 +11,7 @@ describe("main", () => {
   let stderr: string[];
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-"));
     stdout = [];
     stderr = [];
   });
@@ -32,26 +32,26 @@ describe("main", () => {
   it("prints usage and exits 0 on bare invocation", () => {
     const exitCode = run([]);
     expect(exitCode).toBe(0);
-    expect(stdout.join("")).toContain("Usage: pauta <command> [args]");
+    expect(stdout.join("")).toContain("Usage: scrummy <command> [args]");
   });
 
   it("prints usage and exits 0 on --help", () => {
     const exitCode = run(["--help"]);
     expect(exitCode).toBe(0);
-    expect(stdout.join("")).toContain("Usage: pauta <command> [args]");
+    expect(stdout.join("")).toContain("Usage: scrummy <command> [args]");
   });
 
   it("prints usage and exits 0 on -h", () => {
     const exitCode = run(["-h"]);
     expect(exitCode).toBe(0);
-    expect(stdout.join("")).toContain("Usage: pauta <command> [args]");
+    expect(stdout.join("")).toContain("Usage: scrummy <command> [args]");
   });
 
   it("prints an unknown-command error with a hint and exits 1", () => {
     const exitCode = run(["bogus"]);
     expect(exitCode).toBe(1);
     expect(stderr.join("")).toContain("Unknown command: bogus");
-    expect(stderr.join("")).toContain('Run "pauta --help"');
+    expect(stderr.join("")).toContain('Run "scrummy --help"');
   });
 
   it("dispatches a known command and prints its result", () => {
@@ -75,28 +75,28 @@ describe("main", () => {
 });
 
 describe("isEntryPoint", () => {
-  const pautaPath = path.join(import.meta.dirname, "pauta.ts");
-  const pautaUrl = pathToFileURL(pautaPath).href;
+  const scrummyPath = path.join(import.meta.dirname, "scrummy.ts");
+  const scrummyUrl = pathToFileURL(scrummyPath).href;
 
   it("returns true when argv[1] is the real path to the module", () => {
-    expect(isEntryPoint(pautaPath, pautaUrl)).toBe(true);
+    expect(isEntryPoint(scrummyPath, scrummyUrl)).toBe(true);
   });
 
-  it("resolves a symlinked argv[1] (e.g. node_modules/.bin/pauta) to the real module path", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-symlink-"));
-    const symlinkPath = path.join(tmpDir, "pauta-bin");
-    fs.symlinkSync(pautaPath, symlinkPath);
+  it("resolves a symlinked argv[1] (e.g. node_modules/.bin/scrummy) to the real module path", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-symlink-"));
+    const symlinkPath = path.join(tmpDir, "scrummy-bin");
+    fs.symlinkSync(scrummyPath, symlinkPath);
 
-    expect(isEntryPoint(symlinkPath, pautaUrl)).toBe(true);
+    expect(isEntryPoint(symlinkPath, scrummyUrl)).toBe(true);
 
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
   it("returns false for an unrelated path", () => {
-    expect(isEntryPoint("/some/unrelated/file.js", pautaUrl)).toBe(false);
+    expect(isEntryPoint("/some/unrelated/file.js", scrummyUrl)).toBe(false);
   });
 
   it("returns false when argv[1] is undefined", () => {
-    expect(isEntryPoint(undefined, pautaUrl)).toBe(false);
+    expect(isEntryPoint(undefined, scrummyUrl)).toBe(false);
   });
 });

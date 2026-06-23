@@ -12,7 +12,7 @@ describe("logProgress", () => {
   let id: number;
 
   beforeEach(() => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "pauta-test-"));
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), "scrummy-test-"));
     init(cwd);
     id = addIssue(cwd, "Dark mode");
   });
