@@ -36,6 +36,37 @@ describe("assertSprintExists", () => {
   it("throws when the sprint does not exist", () => {
     expect(() => assertSprintExists([sprint("foundation")], "missing")).toThrow(/missing/);
   });
+
+  it("appends a Did you mean suggestion when a close match exists (substring)", () => {
+    expect(() => assertSprintExists([sprint("auth-hardening")], "auth")).toThrow(/Did you mean "auth-hardening"/);
+  });
+
+  it("appends a Did you mean suggestion when a close match exists (edit distance)", () => {
+    expect(() =>
+      assertSprintExists([sprint("onboarding-polish")], "onboarding-polsh"),
+    ).toThrow(/Did you mean "onboarding-polish"/);
+  });
+
+  it("does not append Did you mean when no close match exists", () => {
+    expect(() => assertSprintExists([sprint("auth-hardening")], "xyz")).toThrow("xyz");
+    let message = "";
+    try {
+      assertSprintExists([sprint("auth-hardening")], "xyz");
+    } catch (e) {
+      message = e instanceof Error ? e.message : "";
+    }
+    expect(message).not.toContain("Did you mean");
+  });
+
+  it("picks the best match among multiple sprints", () => {
+    const sprints = [sprint("auth-hardening"), sprint("onboarding-polish"), sprint("export-flow")];
+    expect(() => assertSprintExists(sprints, "onboarding-polsh")).toThrow(
+      /Did you mean "onboarding-polish"/,
+    );
+    expect(() => assertSprintExists(sprints, "onboarding-polsh")).not.toThrow(
+      /Did you mean "auth-hardening"/,
+    );
+  });
 });
 
 describe("assertSprintNameAvailable", () => {
