@@ -27,7 +27,7 @@ discrepancy, it reports it; it never fixes it.
 2. Run `npx pauta show --json --done` (include done issues/sprints — migrated items
    may already be marked done) to read the actual current state.
 3. Reconcile sprints: for every sprint name in the table, confirm it exists in
-   `show --json`. Flag any that are missing.
+   `npx pauta show --json`. Flag any that are missing.
 4. Reconcile issues, row by row: for each table row, find an issue whose title
    exactly matches the row's *proposed title* (use the table as currently
    written — if the user edited a title before approving, match the edited
@@ -45,7 +45,7 @@ discrepancy, it reports it; it never fixes it.
    matched issue. Existence only — whether the content is good is out of scope
    here.
 7. If the open-questions section recorded an answer to "mark `<sprint>` active",
-   confirm `show --json`'s active sprint matches. If the question was left
+   confirm `npx pauta show --json`'s active sprint matches. If the question was left
    unanswered, skip this check — `pauta-migrate` doesn't guess, so there's nothing
    to verify.
 8. Report the result as counts plus a list of flags, one line each (row/issue

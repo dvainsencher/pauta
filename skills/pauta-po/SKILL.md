@@ -75,7 +75,7 @@ guess between two close matches — ask which they mean.
 |---|---|
 | "where are we", "catch me up", "what's the status" | Answer directly from a fresh `npx pauta show --json` — no sub-skill needed. |
 | "PO, proceed sprint X", "PO, continue sprint X", "where did I leave off [on issue #N]", "resume issue #N" | Run `npx pauta show --json` fresh, find the `doing` issue(s) in scope (every `doing` issue in sprint X, or just issue #N). For each one with `hasLog: true`, run `npx pauta show-log <id>` and summarize the plan/verified/pending entries before continuing the work. For any with `hasLog: false`, say so plainly — don't invent history. See principle 9. |
-| "what should I work on next" | Answer from `show --json`, but **state the gap plainly**: issues have no priority field, only sprints do (`position`); issues within a sprint come back in id/creation order, not deliberate priority. Offer to ask which matters most rather than inventing an answer. |
+| "what should I work on next" | Answer from `npx pauta show --json`, but **state the gap plainly**: issues have no priority field, only sprints do (`position`); issues within a sprint come back in id/creation order, not deliberate priority. Offer to ask which matters most rather than inventing an answer. |
 | "is sprint X ready to start" | Check directly: any issue still `idea`? If so, suggest `pauta-refine` (single or batch mode, per its own up-front question) over that sprint before activating it. |
 | "let's plan the backlog" / "let's start working on this new project" (no issues yet) | `pauta-bootstrap`. |
 | "turn my notes into backlog items" | `pauta-scratchpad-import`. |
@@ -127,7 +127,7 @@ backlog item instead of faking the behavior with existing fields:
   it by hand (remove-issue + add-issue + spec-content copy) loses traceability
   between the old and new ids, so don't improvise it silently.
 - **Staleness queries** ("what's gone stale") — `createdAt`/`updatedAt` exist in
-  `show --json`, but nothing filters or sorts on them.
+  `npx pauta show --json`, but nothing filters or sorts on them.
 - **Issue-level prioritization** beyond id/creation order — only sprints have a
   `position` field.
 

@@ -86,9 +86,17 @@ describe("skill source files", () => {
       const skillFile = path.join(src, dir, "SKILL.md");
       if (!fs.existsSync(skillFile)) continue;
       const content = fs.readFileSync(skillFile, "utf8");
-      // Match backtick-invocations of pauta commands (not skill names like `pauta-add-issue`)
-      const bareInvocations = content.match(/`pauta [a-z]/g);
-      if (bareInvocations) {
+      // Two bad patterns:
+      // 1. `pauta <cmd>` — has pauta prefix but missing npx
+      // 2. `<known-subcommand> <args>` — subcommand invocation (with args) missing pauta prefix entirely
+      // Prose references like "the `add-issue` command" (subcommand + closing backtick) are fine.
+      const SUBCOMMANDS =
+        "show|add-issue|edit-issue|remove-issue|create-sprint|edit-sprint|remove-sprint|move|set-status|set-sprint-status|set-active|set-position|spec|log-issue|show-log|import|init|install-skills";
+      const bareWithPauta = content.match(/`pauta [a-z]/g) ?? [];
+      // Only flag when followed by space+args (not closing backtick — that's just a name reference)
+      const bareSubcommand = content.match(new RegExp(`\`(?:${SUBCOMMANDS}) `, "g")) ?? [];
+      const bareInvocations = [...bareWithPauta, ...bareSubcommand];
+      if (bareInvocations.length > 0) {
         violations.push(`${dir}/SKILL.md: ${bareInvocations.join(", ")}`);
       }
     }
