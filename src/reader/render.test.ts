@@ -202,4 +202,51 @@ describe("renderRoadmapMarkdown", () => {
     const out = renderRoadmapMarkdown(plan());
     expect(out).not.toContain("## Backlog");
   });
+
+  it("renders a sprint with no issues without crashing", () => {
+    const p = plan({
+      sprints: [
+        {
+          name: "empty-sprint",
+          position: 1,
+          status: "planned",
+          goal: "",
+          notes: "",
+          active: false,
+          issues: [],
+        },
+      ],
+    });
+    const out = renderRoadmapMarkdown(p);
+    expect(out).toContain("## Sprint: empty-sprint (planned)");
+  });
+
+  it("checks off a done issue inside a sprint", () => {
+    const p = plan({
+      sprints: [
+        {
+          name: "foundation",
+          position: 10,
+          status: "completed",
+          goal: "",
+          notes: "",
+          active: false,
+          issues: [
+            {
+              id: 7,
+              title: "Done in sprint",
+              status: "done",
+              sprint: "foundation",
+              createdAt: "",
+              updatedAt: "",
+              hasSpec: false,
+              hasLog: false,
+            },
+          ],
+        },
+      ],
+    });
+    const out = renderRoadmapMarkdown(p);
+    expect(out).toContain("- [x] #7 Done in sprint");
+  });
 });

@@ -41,7 +41,11 @@ export function main(io: MainIO): number {
   try {
     const result = handler(io.cwd, rest);
     if (roadmapMutatingCommands.has(commandName)) {
-      generateRoadmapMarkdown(io.cwd);
+      try {
+        generateRoadmapMarkdown(io.cwd);
+      } catch {
+        // best-effort — mutation already committed, don't mask the success
+      }
     }
     if (result !== undefined) {
       io.stdout(`${result}\n`);
