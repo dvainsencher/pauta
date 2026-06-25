@@ -8,6 +8,7 @@ import { logProgress } from "./commands/logProgress.js";
 import { move, moveToBacklog } from "./commands/move.js";
 import { removeIssue } from "./commands/removeIssue.js";
 import { removeSprint } from "./commands/removeSprint.js";
+import { roadmap } from "./commands/roadmap.js";
 import { setActive } from "./commands/setActive.js";
 import { setPosition } from "./commands/setPosition.js";
 import { setSprintStatus } from "./commands/setSprintStatus.js";
@@ -165,7 +166,27 @@ export const commands: Record<string, CommandHandler> = {
   },
 
   status: (cwd) => status(cwd),
+
+  roadmap: (cwd) => roadmap(cwd),
 };
+
+// Commands that change issues or sprints. After any of these runs, ROADMAP.md
+// is regenerated so it never drifts from docs/roadmap/*.
+export const roadmapMutatingCommands: ReadonlySet<string> = new Set([
+  "init",
+  "add-issue",
+  "edit-issue",
+  "import",
+  "remove-issue",
+  "create-sprint",
+  "edit-sprint",
+  "remove-sprint",
+  "move",
+  "set-status",
+  "set-sprint-status",
+  "set-active",
+  "set-position",
+]);
 
 export const commandDescriptions: Record<string, string> = {
   init: "Scaffold docs/roadmap/ in a project",
@@ -187,4 +208,5 @@ export const commandDescriptions: Record<string, string> = {
   show: "Show the backlog and sprints",
   "install-skills": "Install scrummy's Claude Code skills into this project",
   status: "Print a one-line summary of the active sprint",
+  roadmap: "Regenerate the human-readable ROADMAP.md from the backlog",
 };

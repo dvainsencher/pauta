@@ -23,3 +23,7 @@ export function specFilePath(cwd: string, id: number): string {
 export function progressFilePath(cwd: string): string {
   return path.join(roadmapDir(cwd), "progress.jsonl");
 }
+
+export function roadmapMarkdownPath(cwd: string): string {
+  return path.join(cwd, "ROADMAP.md");
+}

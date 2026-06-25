@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { commandDescriptions, commands } from "../cli/registry.js";
+import { commandDescriptions, commands, roadmapMutatingCommands } from "../cli/registry.js";
 import { buildUsageText } from "../cli/usage.js";
+import { generateRoadmapMarkdown } from "../cli/commands/roadmap.js";
 
 export function isEntryPoint(argv1: string | undefined, moduleUrl: string): boolean {
   if (argv1 === undefined) {
@@ -39,6 +40,9 @@ export function main(io: MainIO): number {
 
   try {
     const result = handler(io.cwd, rest);
+    if (roadmapMutatingCommands.has(commandName)) {
+      generateRoadmapMarkdown(io.cwd);
+    }
     if (result !== undefined) {
       io.stdout(`${result}\n`);
     }

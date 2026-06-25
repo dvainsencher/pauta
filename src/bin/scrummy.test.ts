@@ -72,6 +72,20 @@ describe("main", () => {
     expect(exitCode).toBe(1);
     expect(stderr.join("")).toContain("foo");
   });
+
+  it("regenerates ROADMAP.md after a mutating command like add-issue", () => {
+    run(["init"]);
+    run(["add-issue", "Dark mode"]);
+    const content = fs.readFileSync(path.join(cwd, "ROADMAP.md"), "utf8");
+    expect(content).toContain("Dark mode");
+  });
+
+  it("does not write ROADMAP.md for a read-only command like show", () => {
+    run(["init"]);
+    fs.rmSync(path.join(cwd, "ROADMAP.md"), { force: true });
+    run(["show"]);
+    expect(fs.existsSync(path.join(cwd, "ROADMAP.md"))).toBe(false);
+  });
 });
 
 describe("isEntryPoint", () => {
