@@ -1,4 +1,7 @@
-# Build plan
+# Build plan (archived)
+
+> **Archived.** This file was the legacy backlog before scrummy was self-hosted.
+> The canonical backlog now lives in `docs/roadmap/` — use `npx scrummy show` to read it.
 
 A **soft** plan — sprints are context batches, positions are advisory, and the order is a suggestion you can abandon. Laid out roughly the way `roadmap show` would render it, because we may as well eat our own dog food.
 

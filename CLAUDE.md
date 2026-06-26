@@ -24,7 +24,9 @@ through the CLI.
 - **Distribution**: per-project install only (no global mode). `scrummy init` scaffolds
   `docs/roadmap/` inside each project; CLI and skill files are installed per-project.
 
-## Status
+## Backlog
 
-Greenfield — no code yet. Current build plan lives in `SPRINTS.md`; sprint
-`foundation` (position 10) is first, starting with `#0 scrummy init`.
+This project tracks its own work with scrummy. Use `npx scrummy show` to see
+the current backlog and sprint state. Do not read or write `SPRINTS.md` (legacy,
+superseded by `docs/roadmap/`) or `docs/roadmap/*` files directly — go through
+the CLI.

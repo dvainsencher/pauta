@@ -33,7 +33,7 @@
 {"id":33,"title":"scrummy-bootstrap: third case for migrating an existing hand-rolled backlog","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
 {"id":34,"title":"CLI batch-import — scrummy import <file> validates + writes all issues at once","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
 {"id":35,"title":"scrummy init: refuse when docs/roadmap/ exists with non-scrummy content","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
-{"id":36,"title":"README/CLAUDE.md template: Adopting scrummy section","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
+{"id":36,"title":"README/CLAUDE.md template: \"Adopting scrummy\" section","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T13:01:37.886Z"}
 {"id":37,"title":"Sprint-structure ambiguity surfaced explicitly in scrummy-migrate","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
 {"id":38,"title":"scrummy-migrate skill — mechanical migration only, fidelity-first","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
 {"id":39,"title":"scrummy-audit skill — migration fidelity audit","status":"done","sprint":"migration-tooling","createdAt":"2026-06-26T12:33:34.858Z","updatedAt":"2026-06-26T12:33:34.858Z"}
