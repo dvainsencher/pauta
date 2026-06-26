@@ -12,7 +12,7 @@ import { SprintPicker } from "./sprintPicker.js";
 import { moveLeft, moveRight, moveUp, moveDown, type NavState } from "./navigation.js";
 import { CardDetail } from "./cardDetail.js";
 
-const CARD_HEIGHT = 5;
+const CARD_HEIGHT = 6; // border-top + id/status + title + sprint-name + border-bottom + marginBottom
 const FIXED_ROWS = 7;
 
 const STATUS_COLORS: Record<IssueStatus, string> = {

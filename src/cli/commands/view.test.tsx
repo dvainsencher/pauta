@@ -79,6 +79,22 @@ describe("KanbanApp", () => {
     expect(lastFrame() ?? "").toMatch(/↓.*more/);
   });
 
+  it("triggers scroll when 3 sprint issues are present without explicit maxVisibleCards (CARD_HEIGHT must account for sprint line)", () => {
+    // Sprint issues render 6 lines each: border-top, id/status, title, sprint-name, border-bottom, margin.
+    // The test mock has no stdout.rows, so terminalRows falls back to 24 and
+    // maxVisible = floor((24 - FIXED_ROWS) / CARD_HEIGHT). If CARD_HEIGHT=5 (wrong), maxVisible=3
+    // and 3 issues fit without scrolling — but the 3rd card overflows the terminal and ink clips it,
+    // causing the selection to go off-screen without the board scrolling (#66).
+    // Correct CARD_HEIGHT=6 → maxVisible=2, so 3 sprint issues require a scroll indicator.
+    const issues = Array.from({ length: 3 }, (_, i) => ({
+      id: i + 1, title: `Issue ${i + 1}`, status: "idea" as const,
+      sprint: "current-sprint", createdAt: "", updatedAt: "", hasSpec: false, hasLog: false,
+    }));
+    const data = makeData({ columns: { idea: issues, ready: [], doing: [], done: [] } });
+    const { lastFrame } = render(<KanbanApp data={data} />);
+    expect(lastFrame() ?? "").toMatch(/↓.*more/);
+  });
+
   it("shows up-scroll indicator and hides scrolled-past issues when scrollOffset > 0", () => {
     const issues = Array.from({ length: 4 }, (_, i) => ({
       id: i + 1, title: `Issue ${i + 1}`, status: "idea" as const,
