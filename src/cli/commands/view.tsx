@@ -12,7 +12,12 @@ import { SprintPicker } from "./sprintPicker.js";
 import { moveLeft, moveRight, moveUp, moveDown, type NavState } from "./navigation.js";
 import { CardDetail } from "./cardDetail.js";
 
-const CARD_HEIGHT = 6; // border-top + id/status + title + sprint-name + border-bottom + marginBottom
+// Worst-case card height: border-top + id/status + title + sprint-name + indicators + border-bottom + marginBottom.
+// Over-estimating here is safe (wastes 1-2 rows on smaller cards); under-estimating causes clampScroll
+// to believe a card is in-view while ink clips it below the terminal edge, breaking scroll-to-selected.
+const CARD_HEIGHT = 7;
+// Non-card rows: title(1) + margin(1) + col-header(3) + footer-margin(1) + footer(1) = 7.
+// The maxVisible formula subtracts 2 more for the up/down scroll indicator lines that appear while scrolling.
 const FIXED_ROWS = 7;
 
 const STATUS_COLORS: Record<IssueStatus, string> = {
@@ -99,7 +104,9 @@ interface KanbanAppProps {
   data: KanbanData;
   plan?: Plan;
   cwd?: string;
+  /** @internal test injection — overrides terminal-height-based calculation */
   maxVisibleCards?: number;
+  /** @internal test injection — preset scroll positions */
   initialScrollOffsets?: number[];
 }
 
@@ -108,13 +115,14 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
   const [showPicker, setShowPicker] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [nav, setNav] = useState<NavState>({ colIndex: 0, rowIndex: 0 });
-  const [scrollOffsets, setScrollOffsets] = useState(initialScrollOffsets ?? [0, 0, 0, 0]);
+  const [scrollOffsets, setScrollOffsets] = useState(initialScrollOffsets ?? ISSUE_STATUSES.map(() => 0));
   const [detail, setDetail] = useState<{ issue: IssueView; spec: string | null; log: ProgressEntry[] } | null>(null);
   const { exit } = useApp();
   const { stdout } = useStdout();
 
   const terminalRows = stdout?.rows ?? 24;
-  const maxVisible = maxVisibleProp ?? Math.max(1, Math.floor((terminalRows - FIXED_ROWS) / CARD_HEIGHT));
+  // Subtract 2 extra for the up/down scroll indicators that appear during scrolling.
+  const maxVisible = maxVisibleProp ?? Math.max(1, Math.floor((terminalRows - FIXED_ROWS - 2) / CARD_HEIGHT));
 
   const focusedIssue = (): IssueView | null => {
     const status = ISSUE_STATUSES[nav.colIndex];
@@ -131,7 +139,7 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
   const resetView = (newData: KanbanData) => {
     setData(newData);
     setNav({ colIndex: 0, rowIndex: 0 });
-    setScrollOffsets([0, 0, 0, 0]);
+    setScrollOffsets(ISSUE_STATUSES.map(() => 0));
   };
 
   useInput((input, key) => {

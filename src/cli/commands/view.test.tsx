@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
 import { render } from "ink-testing-library";
+import { act } from "react";
 import React from "react";
+
+// Required for act() to work in a non-DOM test environment (ink uses react-reconciler)
+beforeAll(() => { (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true; });
 import { KanbanApp, clampScroll } from "./view.js";
 import type { KanbanData } from "./kanban.js";
 
@@ -85,10 +89,26 @@ describe("KanbanApp", () => {
     // maxVisible = floor((24 - FIXED_ROWS) / CARD_HEIGHT). If CARD_HEIGHT=5 (wrong), maxVisible=3
     // and 3 issues fit without scrolling — but the 3rd card overflows the terminal and ink clips it,
     // causing the selection to go off-screen without the board scrolling (#66).
-    // Correct CARD_HEIGHT=6 → maxVisible=2, so 3 sprint issues require a scroll indicator.
+    // CARD_HEIGHT=7 → maxVisible=2, so 3 sprint issues require a scroll indicator.
     const issues = Array.from({ length: 3 }, (_, i) => ({
       id: i + 1, title: `Issue ${i + 1}`, status: "idea" as const,
       sprint: "current-sprint", createdAt: "", updatedAt: "", hasSpec: false, hasLog: false,
+    }));
+    const data = makeData({ columns: { idea: issues, ready: [], doing: [], done: [] } });
+    const { lastFrame } = render(<KanbanApp data={data} />);
+    expect(lastFrame() ?? "").toMatch(/↓.*more/);
+  });
+
+  it("triggers scroll when 2 indicator-bearing sprint issues are present without explicit maxVisibleCards (CARD_HEIGHT must account for indicators)", () => {
+    // Issues with hasSpec or hasLog render 7 lines: border-top, id/status, title, sprint-name,
+    // indicators, border-bottom, margin. CARD_HEIGHT must be 7 so maxVisible is not overestimated.
+    // If CARD_HEIGHT=6, maxVisible=2 but each card needs 7 lines; with a 24-row terminal
+    // (17 available) two 7-line cards = 14 lines which fits, so this test requires 3 such issues.
+    // If CARD_HEIGHT=6 on a 40-row terminal, maxVisible=5 but 5×7=35+7=42>40 — the 5th card
+    // overflows and clampScroll silently thinks it is in view, breaking scroll-to-selected.
+    const issues = Array.from({ length: 3 }, (_, i) => ({
+      id: i + 1, title: `Issue ${i + 1}`, status: "idea" as const,
+      sprint: "current-sprint", createdAt: "", updatedAt: "", hasSpec: true, hasLog: false,
     }));
     const data = makeData({ columns: { idea: issues, ready: [], doing: [], done: [] } });
     const { lastFrame } = render(<KanbanApp data={data} />);
@@ -109,6 +129,30 @@ describe("KanbanApp", () => {
     expect(frame).not.toContain("Issue 2");
   });
 });
+
+  it("scrolls board when navigating down past the visible window", () => {
+    const issues = Array.from({ length: 4 }, (_, i) => ({
+      id: i + 1, title: `Issue ${i + 1}`, status: "idea" as const,
+      sprint: "s1", createdAt: "", updatedAt: "", hasSpec: false, hasLog: false,
+    }));
+    const data = makeData({ columns: { idea: issues, ready: [], doing: [], done: [] } });
+    const { lastFrame, stdin } = render(<KanbanApp data={data} maxVisibleCards={2} />);
+
+    // Initial state: issues 1 and 2 visible, issue 3 and 4 below fold
+    expect(lastFrame() ?? "").toContain("Issue 1");
+    expect(lastFrame() ?? "").toContain("Issue 2");
+    expect(lastFrame() ?? "").not.toContain("Issue 3");
+
+    // Navigate to row 1 (still in view) — act() flushes React between presses
+    act(() => stdin.write("\x1B[B"));
+    expect(lastFrame() ?? "").toContain("Issue 1");
+
+    // Navigate to row 2 — outside the window, board must scroll
+    act(() => stdin.write("\x1B[B"));
+    const frame = lastFrame() ?? "";
+    expect(frame).toContain("Issue 3");   // now visible
+    expect(frame).not.toContain("Issue 1"); // scrolled past
+  });
 
 describe("clampScroll", () => {
   it("returns offset unchanged when rowIndex is within view", () => {
