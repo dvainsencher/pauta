@@ -59,6 +59,12 @@ describe("keyboard navigation", () => {
     expect(moveDown(state, cols).rowIndex).toBe(1);
   });
 
+  it("moveDown on an empty column returns rowIndex 0, not -1", () => {
+    const cols = makeColumns([1, 0, 0, 0]);
+    const state: NavState = { colIndex: 1, rowIndex: 0 };
+    expect(moveDown(state, cols).rowIndex).toBe(0);
+  });
+
   it("moveUp retreats row", () => {
     const cols = makeColumns([0, 2, 0, 0]);
     const state: NavState = { colIndex: 1, rowIndex: 1 };

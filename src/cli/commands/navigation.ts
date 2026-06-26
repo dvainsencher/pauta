@@ -27,6 +27,7 @@ export function moveLeft(state: NavState, columns: KanbanColumns): NavState {
 
 export function moveDown(state: NavState, columns: KanbanColumns): NavState {
   const count = colIssueCount(columns, state.colIndex);
+  if (count === 0) return state;
   return { ...state, rowIndex: Math.min(count - 1, state.rowIndex + 1) };
 }
 
