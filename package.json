@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "tsx src/bin/scrummy.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run typecheck && npm run test"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
