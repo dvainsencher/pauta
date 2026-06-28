@@ -116,9 +116,11 @@ There's no CLI-level enforcement of this (`set-status` has no validation hook
 beyond status-name checking) — it's a discipline this skill and `scrummy-add-issue`
 hold themselves to:
 
-- Before the PO issues `npx scrummy set-status <id> ready` or `npx scrummy set-active <name>`
+- Before the PO issues `npx scrummy set-status <id> ready` or `npx scrummy set-status <id> doing`
   *directly* (not as part of following another skill's own flow, which has its
-  own rules), run `scrummy-refine`'s single-issue check first.
+  own rules), run `scrummy-refine`'s single-issue check first. (Sprint status is
+  derived from issues — setting an issue to `doing` is how a sprint becomes active;
+  there is no `set-active` command.)
 - `scrummy-add-issue` already does the equivalent for issues filed straight at
   `ready` instead of the `idea` default (see its step 3).
 

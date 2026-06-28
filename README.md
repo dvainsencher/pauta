@@ -43,11 +43,20 @@ A **context batch**: a set of related work sized to fit comfortably in an agent'
 |---|---|
 | `name` | how you refer to it ("the export sprint") |
 | `position` | advisory sort order — see below |
-| `status` | `planned → active → done` |
 | `goal` | what this batch is for |
 | `notes` | optional |
 
 A sprint's **membership is not stored on the sprint** — it's derived by filtering issues whose `sprint` matches. One source of truth, no drift.
+
+**Status is derived too, never stored.** A sprint's `planned → active → done` state is computed from its issues every time it's read, so it can't drift out of sync and there is no command to set it:
+
+| derived status | when |
+|---|---|
+| `planned` | no work started yet — every issue is `idea`/`ready`, or the sprint is empty |
+| `active` | some issue is `doing`/`done` **and** some issue is not `done` (work started, work remaining) |
+| `done` | the sprint has issues and every one of them is `done` |
+
+This is the guardrail: a sprint can't claim to be `done` while it holds an open issue, nor `planned` once work has begun. A sprint *activates* by starting work on its issues (`scrummy set-status <id> doing`) and *completes* when the last one is done. **Several sprints can be active at once** — that's allowed; `scrummy status` reports the lowest-`position` active one as the current focus.
 
 **Order is advisory, not structural.** `position` is just a sort key for display. Plan several sprints ahead (positions 10, 20, 30) and they read as an intended sequence — but the sequence binds nothing. Reorder with a single edit (`set-position export 5`), and nothing renumbers. Activating a sprint out of "order" (work on #11 before #8) is not a transgression because there is no enforced order. Gaps of 10 let you slot a new sprint between two existing ones without touching either.
 
@@ -128,8 +137,9 @@ scrummy create-sprint <name> --goal "..." [--notes "..."] [--position <n>]
 scrummy edit-sprint <name> [--goal "..."] [--notes "..."]
 scrummy remove-sprint <name>                 # only if empty — move issues out first
 scrummy set-position <name> <n>              # advisory sort only
-scrummy set-active <name>                    # mark which sprint you're working on
-scrummy set-sprint-status <name> <planned|active|done>
+# Sprint status is derived from its issues — there is no command to set it.
+# A sprint becomes active when you start work on its issues (set-status <id> doing),
+# and done when all of them are done. See "Sprint status" below.
 
 scrummy spec <id>                            # create/return path to specs/<id>.md
 
@@ -153,7 +163,9 @@ scrummy show [--sprint <name>] [--done]      # the human-scannable whole plan
 scrummy show --json                          # same content, structured, for the agent
 scrummy show-log <id>                        # the progress-log entries for one issue, structured, for the agent
 scrummy status                               # one-line summary of the active sprint, e.g. for a shell statusline
-scrummy view                                 # interactive terminal kanban board (Ink TUI)
+scrummy view                                 # interactive terminal kanban board (Ink TUI); press S for the
+                                             #   sprint board — every sprint laid out in ACTIVE | PLANNED | DONE
+                                             #   columns by derived status; Enter drills into a sprint's issues
 ```
 
 Default `show` output:
