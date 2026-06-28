@@ -10,11 +10,10 @@ import {
   assertRoadmapDirNotForeign,
   assertSprintExists,
   assertSprintNameAvailable,
-  assertSprintStatus,
 } from "./validation.js";
 
 function sprint(name: string): Sprint {
-  return { name, position: 10, status: "planned", goal: "", notes: "" };
+  return { name, position: 10, goal: "", notes: "" };
 }
 
 function issue(id: number): Issue {
@@ -98,16 +97,6 @@ describe("assertIssueStatus", () => {
 
   it("throws for an invalid status", () => {
     expect(() => assertIssueStatus("bogus")).toThrow(/bogus/);
-  });
-});
-
-describe("assertSprintStatus", () => {
-  it("does not throw for a valid status", () => {
-    expect(() => assertSprintStatus("active")).not.toThrow();
-  });
-
-  it("throws for an invalid status", () => {
-    expect(() => assertSprintStatus("bogus")).toThrow(/bogus/);
   });
 });
 

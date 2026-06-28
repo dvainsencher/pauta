@@ -1,5 +1,21 @@
-import type { IssueStatus } from "../../domain/types.js";
+import type { IssueStatus, SprintStatus } from "../../domain/types.js";
 import type { IssueView, SprintGroup } from "../../reader/plan.js";
+
+// Column order for the sprint board: in-progress work first, then what's queued, then done.
+export const SPRINT_COLUMN_ORDER: readonly SprintStatus[] = ["active", "planned", "done"];
+
+export type SprintColumns = Record<SprintStatus, SprintGroup[]>;
+
+/**
+ * Group sprints into the board's status columns, each ordered by position. Status is
+ * already derived on every SprintGroup (see domain/sprintStatus.ts), so this is a pure
+ * bucketing of the plan's sprints.
+ */
+export function groupSprintsByStatus(sprints: SprintGroup[]): SprintColumns {
+  const inColumn = (status: SprintStatus) =>
+    sprints.filter((s) => s.status === status).sort((a, b) => a.position - b.position);
+  return { active: inColumn("active"), planned: inColumn("planned"), done: inColumn("done") };
+}
 
 export interface KanbanColumns {
   idea: IssueView[];

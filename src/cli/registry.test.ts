@@ -52,11 +52,15 @@ describe("command registry", () => {
     expect(readSprints(cwd)).toEqual([]);
   });
 
-  it("set-active marks the sprint active", () => {
+  it("no longer registers the removed manual sprint-status commands (status is derived)", () => {
+    expect(commands["set-active"]).toBeUndefined();
+    expect(commands["set-sprint-status"]).toBeUndefined();
+  });
+
+  it("create-sprint stores no status field (status is derived, never stored)", () => {
     commands.init(cwd, []);
     commands["create-sprint"](cwd, ["foundation", "--goal", "g"]);
-    commands["set-active"](cwd, ["foundation"]);
-    expect(readSprints(cwd)[0].status).toBe("active");
+    expect(readSprints(cwd)[0]).not.toHaveProperty("status");
   });
 
   it("spec returns the spec file path", () => {

@@ -18,15 +18,15 @@ describe("createSprint", () => {
     fs.rmSync(cwd, { recursive: true, force: true });
   });
 
-  it("creates a sprint with status planned", () => {
+  it("creates a sprint with no stored status (status is derived from its issues)", () => {
     createSprint(cwd, "foundation", { goal: "build the mechanical layer" });
     const [sprint] = readSprints(cwd);
     expect(sprint).toMatchObject({
       name: "foundation",
-      status: "planned",
       goal: "build the mechanical layer",
       notes: "",
     });
+    expect(sprint).not.toHaveProperty("status");
   });
 
   it("returns a confirmation message", () => {

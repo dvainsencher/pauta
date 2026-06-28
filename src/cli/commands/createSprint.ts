@@ -16,7 +16,6 @@ export function createSprint(cwd: string, name: string, options: CreateSprintOpt
   const sprint: Sprint = {
     name,
     position: options.position ?? maxPosition + 10,
-    status: "planned",
     goal: options.goal,
     notes: options.notes ?? "",
   };

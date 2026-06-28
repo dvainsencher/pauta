@@ -71,9 +71,11 @@ source file(s) (e.g. `ROADMAP.md`, `docs/sprints.md`, `TODO.md`, legacy
    - For each row with `spec-action: create`, run `npx scrummy spec <id>` (using the id
      `import` returned for that row) then write the source's detail into the
      resulting spec file with normal file-editing tools.
-   - If the open-questions section has an answered "mark active" question, run
-     `npx scrummy set-active <name>` for that one sprint. Leave it unset if unanswered
-     — don't guess.
+   - If the open-questions section has an answered "mark active" question, start
+     that sprint by setting one of its issues to `doing`
+     (`npx scrummy set-status <id> doing`) — sprint status is derived, so an issue
+     in progress is what makes the sprint "active". There is no `set-active`
+     command. Leave the sprint untouched if the question is unanswered — don't guess.
 8. Report what was created (issue/sprint counts) and remind the user that flagged
    rows were filed as proposed, not resolved — running `scrummy-refine` over the
    result is a separate, explicit next step. Don't delete

@@ -8,7 +8,7 @@ beforeAll(() => { (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONME
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { KanbanApp, clampScroll, computeLayout, buildViewData } from "./view.js";
+import { KanbanApp, computeLayout, buildViewData } from "./view.js";
 import { init } from "./init.js";
 import { addIssue } from "./addIssue.js";
 import { setStatus } from "./setStatus.js";
@@ -262,23 +262,4 @@ describe("buildViewData", () => {
   });
 });
 
-describe("clampScroll", () => {
-  it("returns offset unchanged when rowIndex is within view", () => {
-    expect(clampScroll(0, 1, 3)).toBe(0);
-    expect(clampScroll(2, 3, 3)).toBe(2);
-  });
-
-  it("scrolls down to reveal rowIndex when it is past the bottom of viewport", () => {
-    expect(clampScroll(0, 3, 2)).toBe(2); // offset must shift so row 3 is at bottom
-    expect(clampScroll(0, 5, 3)).toBe(3);
-  });
-
-  it("scrolls up to reveal rowIndex when it is above the top of viewport", () => {
-    expect(clampScroll(3, 1, 2)).toBe(1); // offset jumps up to row 1
-    expect(clampScroll(5, 2, 3)).toBe(2);
-  });
-
-  it("clamps to 0 when rowIndex is 0", () => {
-    expect(clampScroll(0, 0, 5)).toBe(0);
-  });
-});
+// clampScroll now lives in navigation.ts and is covered by navigation.test.ts.

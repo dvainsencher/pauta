@@ -1,36 +1,41 @@
-import type { IssueStatus } from "../../domain/types.js";
-import { ISSUE_STATUSES } from "../../domain/types.js";
-import type { KanbanColumns } from "./kanban.js";
-
 export interface NavState {
   colIndex: number;
   rowIndex: number;
 }
 
-function colIssueCount(columns: KanbanColumns, colIndex: number): number {
-  const status = ISSUE_STATUSES[colIndex] as IssueStatus | undefined;
-  if (!status) return 0;
-  return columns[status].length;
-}
-
-export function moveRight(state: NavState, columns: KanbanColumns): NavState {
-  const nextCol = Math.min(ISSUE_STATUSES.length - 1, state.colIndex + 1);
-  const maxRow = Math.max(0, colIssueCount(columns, nextCol) - 1);
+/**
+ * Column-agnostic keyboard navigation. `counts[i]` is the number of selectable rows
+ * in column `i`. Works for any board — the issue board (4 status columns) and the
+ * sprint board (3 state columns) both drive it with their own per-column counts.
+ */
+export function moveRight(state: NavState, counts: number[]): NavState {
+  const nextCol = Math.min(counts.length - 1, state.colIndex + 1);
+  const maxRow = Math.max(0, (counts[nextCol] ?? 0) - 1);
   return { colIndex: nextCol, rowIndex: Math.min(state.rowIndex, maxRow) };
 }
 
-export function moveLeft(state: NavState, columns: KanbanColumns): NavState {
+export function moveLeft(state: NavState, counts: number[]): NavState {
   const nextCol = Math.max(0, state.colIndex - 1);
-  const maxRow = Math.max(0, colIssueCount(columns, nextCol) - 1);
+  const maxRow = Math.max(0, (counts[nextCol] ?? 0) - 1);
   return { colIndex: nextCol, rowIndex: Math.min(state.rowIndex, maxRow) };
 }
 
-export function moveDown(state: NavState, columns: KanbanColumns): NavState {
-  const count = colIssueCount(columns, state.colIndex);
+export function moveDown(state: NavState, counts: number[]): NavState {
+  const count = counts[state.colIndex] ?? 0;
   if (count === 0) return state;
   return { ...state, rowIndex: Math.min(count - 1, state.rowIndex + 1) };
 }
 
-export function moveUp(state: NavState, _columns: KanbanColumns): NavState {
+export function moveUp(state: NavState, _counts: number[]): NavState {
   return { ...state, rowIndex: Math.max(0, state.rowIndex - 1) };
+}
+
+/**
+ * Scroll-offset that keeps `rowIndex` inside the visible window of `maxVisible` rows.
+ * Shared by every scrolling board so the selected card is always on screen.
+ */
+export function clampScroll(offset: number, rowIndex: number, maxVisible: number): number {
+  if (rowIndex < offset) return rowIndex;
+  if (rowIndex >= offset + maxVisible) return rowIndex - maxVisible + 1;
+  return offset;
 }

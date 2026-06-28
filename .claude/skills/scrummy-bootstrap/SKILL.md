@@ -73,7 +73,9 @@ one you're in before reading further:
    - `npx scrummy add-issue "<title>" [--status idea|ready] [--sprint <name>]` for each
      issue — pass `--sprint` directly for issues going into a sprint you just
      created, or omit it for backlog issues
-   - `npx scrummy set-active <name>` if the user wants to mark one sprint as current
+   - To mark a sprint as the one being worked on now, set one of its issues to
+     `doing` (`npx scrummy set-status <id> doing`) — sprint status is derived, so
+     this is what makes a sprint "active". There is no `set-active` command.
 
 After executing, point the user at `npx scrummy show` to see the result — don't
 re-print the whole plan yourself.

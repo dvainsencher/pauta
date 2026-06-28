@@ -7,9 +7,7 @@ import { createSprint } from "../cli/commands/createSprint.js";
 import { init } from "../cli/commands/init.js";
 import { logProgress } from "../cli/commands/logProgress.js";
 import { move } from "../cli/commands/move.js";
-import { setActive } from "../cli/commands/setActive.js";
 import { setStatus } from "../cli/commands/setStatus.js";
-import { setSprintStatus } from "../cli/commands/setSprintStatus.js";
 import { spec } from "../cli/commands/spec.js";
 import { buildPlan } from "./plan.js";
 
@@ -24,6 +22,10 @@ describe("buildPlan", () => {
   afterEach(() => {
     fs.rmSync(cwd, { recursive: true, force: true });
   });
+
+  // Sprint status is derived from issues — drive it by starting/finishing work.
+  const startWork = (sprint: string) => setStatus(cwd, addIssue(cwd, "work", { sprint }), "doing");
+  const finishSprint = (sprint: string) => setStatus(cwd, addIssue(cwd, "work", { sprint }), "done");
 
   it("puts issues with no sprint in the backlog, sorted by id", () => {
     addIssue(cwd, "Export to CSV");
@@ -60,11 +62,42 @@ describe("buildPlan", () => {
   it("sorts sprints by position, active sprint first", () => {
     createSprint(cwd, "first", { goal: "g", position: 10 });
     createSprint(cwd, "second", { goal: "g", position: 20 });
-    setActive(cwd, "second");
+    startWork("second"); // second has work started → active; first stays planned
     const plan = buildPlan(cwd, {});
     expect(plan.sprints.map((s) => s.name)).toEqual(["second", "first"]);
     expect(plan.sprints[0].active).toBe(true);
     expect(plan.sprints[1].active).toBe(false);
+  });
+
+  it("derives sprint status from its issues", () => {
+    createSprint(cwd, "empty", { goal: "g", position: 10 });
+    createSprint(cwd, "planned", { goal: "g", position: 20 });
+    addIssue(cwd, "just an idea", { sprint: "planned" });
+    createSprint(cwd, "active", { goal: "g", position: 30 });
+    startWork("active");
+    createSprint(cwd, "finished", { goal: "g", position: 40 });
+    finishSprint("finished");
+
+    const byName = Object.fromEntries(
+      buildPlan(cwd, { done: true }).sprints.map((s) => [s.name, s.status]),
+    );
+    expect(byName).toEqual({ empty: "planned", planned: "planned", active: "active", finished: "done" });
+  });
+
+  it("treats finished work plus a remaining issue as active", () => {
+    createSprint(cwd, "foundation", { goal: "g" });
+    finishSprint("foundation"); // one done issue
+    addIssue(cwd, "still to do", { sprint: "foundation" }); // + a non-done issue
+    expect(buildPlan(cwd, { done: true }).sprints[0].status).toBe("active");
+  });
+
+  it("allows several sprints to be active at once", () => {
+    createSprint(cwd, "alpha", { goal: "g", position: 10 });
+    createSprint(cwd, "beta", { goal: "g", position: 20 });
+    startWork("alpha");
+    startWork("beta");
+    const active = buildPlan(cwd, {}).sprints.filter((s) => s.active).map((s) => s.name);
+    expect(active).toEqual(["alpha", "beta"]);
   });
 
   it("hides done issues by default", () => {
@@ -81,13 +114,13 @@ describe("buildPlan", () => {
 
   it("hides done sprints by default", () => {
     createSprint(cwd, "foundation", { goal: "g" });
-    setSprintStatus(cwd, "foundation", "done");
+    finishSprint("foundation");
     expect(buildPlan(cwd, {}).sprints).toHaveLength(0);
   });
 
   it("shows done sprints when done: true", () => {
     createSprint(cwd, "foundation", { goal: "g" });
-    setSprintStatus(cwd, "foundation", "done");
+    finishSprint("foundation");
     expect(buildPlan(cwd, { done: true }).sprints).toHaveLength(1);
   });
 
@@ -108,7 +141,7 @@ describe("buildPlan", () => {
 
   it("an explicit --sprint filter on a done sprint still shows it", () => {
     createSprint(cwd, "foundation", { goal: "g" });
-    setSprintStatus(cwd, "foundation", "done");
+    finishSprint("foundation");
     const plan = buildPlan(cwd, { sprint: "foundation" });
     expect(plan.sprints.map((s) => s.name)).toEqual(["foundation"]);
   });
