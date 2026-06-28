@@ -29,3 +29,13 @@ export function moveDown(state: NavState, counts: number[]): NavState {
 export function moveUp(state: NavState, _counts: number[]): NavState {
   return { ...state, rowIndex: Math.max(0, state.rowIndex - 1) };
 }
+
+/**
+ * Scroll-offset that keeps `rowIndex` inside the visible window of `maxVisible` rows.
+ * Shared by every scrolling board so the selected card is always on screen.
+ */
+export function clampScroll(offset: number, rowIndex: number, maxVisible: number): number {
+  if (rowIndex < offset) return rowIndex;
+  if (rowIndex >= offset + maxVisible) return rowIndex - maxVisible + 1;
+  return offset;
+}

@@ -9,8 +9,11 @@ import { specFilePath } from "../../storage/paths.js";
 import { readProgress } from "../../storage/progressStore.js";
 import { buildKanbanData, selectKanbanView, type KanbanData } from "./kanban.js";
 import { SprintBoard } from "./sprintBoard.js";
-import { moveLeft, moveRight, moveUp, moveDown, type NavState } from "./navigation.js";
+import { moveLeft, moveRight, moveUp, moveDown, clampScroll, type NavState } from "./navigation.js";
 import { CardDetail } from "./cardDetail.js";
+
+// Re-exported for tests that import it from view.js; the implementation now lives in navigation.ts.
+export { clampScroll };
 
 // Enforced total card footprint: border-top + id/status + title + sprint-name + indicators + border-bottom + marginBottom = 7.
 // The Card Box sets height={CARD_HEIGHT - 1} (the 6 bordered rows) plus marginBottom={1}, so the rendered
@@ -43,12 +46,6 @@ const STATUS_COLORS: Record<IssueStatus, string> = {
   doing: "yellow",
   done: "green",
 };
-
-export function clampScroll(offset: number, rowIndex: number, maxVisible: number): number {
-  if (rowIndex < offset) return rowIndex;
-  if (rowIndex >= offset + maxVisible) return rowIndex - maxVisible + 1;
-  return offset;
-}
 
 function Card({ issue, selected, width }: { issue: IssueView; selected: boolean; width: number }) {
   const badge = STATUS_COLORS[issue.status];
@@ -248,6 +245,8 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
       <SprintBoard
         sprints={data.allSprints}
         selected={data.sprintName}
+        rows={dims.rows}
+        cols={dims.cols}
         onSelect={(name) => {
           resetView(selectKanbanView(plan ?? { sprints: data.allSprints, backlog: [] }, name));
           setShowSprintBoard(false);
