@@ -8,7 +8,7 @@ import { buildPlan } from "../../reader/plan.js";
 import { specFilePath } from "../../storage/paths.js";
 import { readProgress } from "../../storage/progressStore.js";
 import { buildKanbanData, selectKanbanView, type KanbanData } from "./kanban.js";
-import { SprintPicker } from "./sprintPicker.js";
+import { SprintBoard } from "./sprintBoard.js";
 import { moveLeft, moveRight, moveUp, moveDown, type NavState } from "./navigation.js";
 import { CardDetail } from "./cardDetail.js";
 
@@ -115,7 +115,7 @@ function Column({
 
 const HELP_TEXT = [
   "Q / Esc  quit",
-  "S        sprint picker",
+  "S        sprint board",
   "B        backlog",
   "←→       move between columns",
   "↑↓       move between cards",
@@ -135,7 +135,7 @@ interface KanbanAppProps {
 
 export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVisibleProp, initialScrollOffsets }: KanbanAppProps) {
   const [data, setData] = useState(initialData);
-  const [showPicker, setShowPicker] = useState(false);
+  const [showSprintBoard, setShowSprintBoard] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [nav, setNav] = useState<NavState>({ colIndex: 0, rowIndex: 0 });
   const [scrollOffsets, setScrollOffsets] = useState(initialScrollOffsets ?? ISSUE_STATUSES.map(() => 0));
@@ -173,9 +173,11 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
     setScrollOffsets(ISSUE_STATUSES.map(() => 0));
   };
 
+  const columnCounts = (): number[] => ISSUE_STATUSES.map((s) => data.columns[s].length);
+
   useInput((input, key) => {
     if (detail !== null) return;
-    if (showPicker) return;
+    if (showSprintBoard) return;
     if (input === "q" || input === "Q" || key.escape) {
       exit();
       return;
@@ -185,7 +187,7 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
       return;
     }
     if (input === "s" || input === "S") {
-      if (data.allSprints.length > 0) setShowPicker(true);
+      if (data.allSprints.length > 0) setShowSprintBoard(true);
       return;
     }
     if ((input === "b" || input === "B") && plan) {
@@ -193,25 +195,25 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
       return;
     }
     if (key.leftArrow) {
-      const newNav = moveLeft(nav, data.columns);
+      const newNav = moveLeft(nav, columnCounts());
       setNav(newNav);
       setScrollOffsets((prev) => updateScroll(newNav, prev));
       return;
     }
     if (key.rightArrow) {
-      const newNav = moveRight(nav, data.columns);
+      const newNav = moveRight(nav, columnCounts());
       setNav(newNav);
       setScrollOffsets((prev) => updateScroll(newNav, prev));
       return;
     }
     if (key.upArrow) {
-      const newNav = moveUp(nav, data.columns);
+      const newNav = moveUp(nav, columnCounts());
       setNav(newNav);
       setScrollOffsets((prev) => updateScroll(newNav, prev));
       return;
     }
     if (key.downArrow) {
-      const newNav = moveDown(nav, data.columns);
+      const newNav = moveDown(nav, columnCounts());
       setNav(newNav);
       setScrollOffsets((prev) => updateScroll(newNav, prev));
       return;
@@ -241,16 +243,16 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
     );
   }
 
-  if (showPicker) {
+  if (showSprintBoard) {
     return (
-      <SprintPicker
+      <SprintBoard
         sprints={data.allSprints}
         selected={data.sprintName}
         onSelect={(name) => {
           resetView(selectKanbanView(plan ?? { sprints: data.allSprints, backlog: [] }, name));
-          setShowPicker(false);
+          setShowSprintBoard(false);
         }}
-        onCancel={() => setShowPicker(false)}
+        onCancel={() => setShowSprintBoard(false)}
       />
     );
   }
@@ -285,7 +287,7 @@ export function KanbanApp({ data: initialData, plan, cwd, maxVisibleCards: maxVi
       <Box marginTop={1} flexShrink={0}>
         {showHelp
           ? <Text dimColor>{HELP_TEXT}</Text>
-          : <Text dimColor>Q quit  S sprints  B backlog  ←→↑↓ navigate  Enter detail  ? help</Text>}
+          : <Text dimColor>Q quit  S sprint board  B backlog  ←→↑↓ navigate  Enter detail  ? help</Text>}
       </Box>
     </Box>
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildKanbanData, selectKanbanView } from "./kanban.js";
+import { buildKanbanData, groupSprintsByStatus, selectKanbanView } from "./kanban.js";
 import type { IssueView, SprintGroup } from "../../reader/plan.js";
 
 function makeIssue(overrides: Partial<IssueView> & { id: number }): IssueView {
@@ -71,11 +71,34 @@ describe("buildKanbanData", () => {
     expect(result.columns.ready.map((i) => i.id)).toEqual([1, 2, 3]);
   });
 
-  it("exposes all sprints for the sprint picker", () => {
+  it("exposes all sprints for the sprint board", () => {
     const s1 = makeSprint({ name: "alpha", active: true });
     const s2 = makeSprint({ name: "beta", status: "planned", active: false });
     const result = buildKanbanData({ sprints: [s1, s2], backlog: [] });
     expect(result.allSprints.map((s) => s.name)).toEqual(["alpha", "beta"]);
+  });
+});
+
+describe("groupSprintsByStatus", () => {
+  it("buckets sprints into active/planned/done columns", () => {
+    const sprints = [
+      makeSprint({ name: "a", status: "active", active: true }),
+      makeSprint({ name: "p", status: "planned", active: false }),
+      makeSprint({ name: "d", status: "done", active: false }),
+      makeSprint({ name: "a2", status: "active", active: true }),
+    ];
+    const cols = groupSprintsByStatus(sprints);
+    expect(cols.active.map((s) => s.name)).toEqual(["a", "a2"]);
+    expect(cols.planned.map((s) => s.name)).toEqual(["p"]);
+    expect(cols.done.map((s) => s.name)).toEqual(["d"]);
+  });
+
+  it("orders sprints within a column by position", () => {
+    const sprints = [
+      makeSprint({ name: "late", status: "active", active: true, position: 30 }),
+      makeSprint({ name: "early", status: "active", active: true, position: 10 }),
+    ];
+    expect(groupSprintsByStatus(sprints).active.map((s) => s.name)).toEqual(["early", "late"]);
   });
 });
 

@@ -91,7 +91,7 @@ describe("skill source files", () => {
       // 2. `<known-subcommand> <args>` — subcommand invocation (with args) missing scrummy prefix entirely
       // Prose references like "the `add-issue` command" (subcommand + closing backtick) are fine.
       const SUBCOMMANDS =
-        "show|add-issue|edit-issue|remove-issue|create-sprint|edit-sprint|remove-sprint|move|set-status|set-sprint-status|set-active|set-position|spec|log-issue|show-log|import|init|install-skills";
+        "show|add-issue|edit-issue|remove-issue|create-sprint|edit-sprint|remove-sprint|move|set-status|set-position|spec|log-issue|show-log|import|init|install-skills";
       const bareWithPauta = content.match(/`scrummy [a-z]/g) ?? [];
       // Only flag when followed by space+args (not closing backtick — that's just a name reference)
       const bareSubcommand = content.match(new RegExp(`\`(?:${SUBCOMMANDS}) `, "g")) ?? [];

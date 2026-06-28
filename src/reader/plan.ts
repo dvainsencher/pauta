@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import type { Issue, Sprint } from "../domain/types.js";
+import type { Issue, Sprint, SprintStatus } from "../domain/types.js";
+import { deriveSprintStatus } from "../domain/sprintStatus.js";
 import { assertIssueExists, assertSprintExists } from "../domain/validation.js";
 import { specFilePath } from "../storage/paths.js";
 import { readIssues } from "../storage/issuesStore.js";
@@ -13,6 +14,7 @@ export interface IssueView extends Issue {
 }
 
 export interface SprintGroup extends Sprint {
+  status: SprintStatus;
   active: boolean;
   issues: IssueView[];
 }
@@ -55,21 +57,30 @@ export function buildPlan(cwd: string, options: BuildPlanOptions): Plan {
     hasLog: progress.some((entry) => entry.issueId === issue.id),
   });
 
+  const allForSprint = (sprintName: string): Issue[] =>
+    issues.filter((issue) => issue.sprint === sprintName);
+
   const issuesForSprint = (sprintName: string): IssueView[] =>
-    issues
-      .filter((issue) => issue.sprint === sprintName)
+    allForSprint(sprintName)
       .filter((issue) => options.done || issue.status !== "done")
       .sort((a, b) => a.id - b.id)
       .map(toView);
 
   const sprintGroups = sprints
     .filter((sprint) => options.sprint === undefined || sprint.name === options.sprint)
-    .filter((sprint) => options.sprint !== undefined || options.done || sprint.status !== "done")
-    .map((sprint) => ({
-      ...sprint,
-      active: sprint.status === "active",
-      issues: issuesForSprint(sprint.name),
-    }))
+    .map((sprint) => {
+      // Status is derived from the sprint's FULL issue list — independent of the
+      // done-hiding filter, or an all-done sprint would look empty (planned).
+      const status = deriveSprintStatus(allForSprint(sprint.name));
+      return {
+        ...sprint,
+        status,
+        active: status === "active",
+        issues: issuesForSprint(sprint.name),
+      };
+    })
+    // Hide done sprints in the whole-plan view unless --done or a specific sprint is asked for.
+    .filter((group) => options.sprint !== undefined || options.done || group.status !== "done")
     .sort((a, b) => {
       if (a.active !== b.active) {
         return a.active ? -1 : 1;

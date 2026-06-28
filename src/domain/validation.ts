@@ -2,7 +2,6 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import {
   ISSUE_STATUSES,
   PROGRESS_ENTRY_TYPES,
-  SPRINT_STATUSES,
   type Issue,
   type ProgressEntryType,
   type Sprint,
@@ -82,14 +81,6 @@ export function assertProgressType(type: string): void {
   if (!PROGRESS_ENTRY_TYPES.includes(type as ProgressEntryType)) {
     throw new Error(
       `Invalid progress type "${type}" — must be one of: ${PROGRESS_ENTRY_TYPES.join(", ")}`,
-    );
-  }
-}
-
-export function assertSprintStatus(status: string): void {
-  if (!SPRINT_STATUSES.includes(status as Sprint["status"])) {
-    throw new Error(
-      `Invalid sprint status "${status}" — must be one of: ${SPRINT_STATUSES.join(", ")}`,
     );
   }
 }

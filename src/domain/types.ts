@@ -11,10 +11,12 @@ export interface Issue {
   updatedAt: string;
 }
 
+// Sprint status is NOT stored — it is derived from the sprint's issues at read time
+// (see domain/sprintStatus.ts). The stored record carries only the sprint's identity,
+// ordering, and free-text fields.
 export interface Sprint {
   name: string;
   position: number;
-  status: SprintStatus;
   goal: string;
   notes: string;
 }

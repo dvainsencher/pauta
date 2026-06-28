@@ -10,9 +10,7 @@ import { move, moveToBacklog } from "./commands/move.js";
 import { removeIssue } from "./commands/removeIssue.js";
 import { removeSprint } from "./commands/removeSprint.js";
 import { roadmap } from "./commands/roadmap.js";
-import { setActive } from "./commands/setActive.js";
 import { setPosition } from "./commands/setPosition.js";
-import { setSprintStatus } from "./commands/setSprintStatus.js";
 import { installSkills } from "./commands/installSkills.js";
 import { setStatus } from "./commands/setStatus.js";
 import { show } from "./commands/show.js";
@@ -101,19 +99,6 @@ export const commands: Record<string, CommandHandler> = {
     return setStatus(cwd, id, status);
   },
 
-  "set-sprint-status": (cwd, args) => {
-    const parsed = parseArgs(args);
-    const name = requirePositional(parsed, 0, "name");
-    const status = requirePositional(parsed, 1, "status");
-    return setSprintStatus(cwd, name, status);
-  },
-
-  "set-active": (cwd, args) => {
-    const parsed = parseArgs(args);
-    const name = requirePositional(parsed, 0, "name");
-    return setActive(cwd, name);
-  },
-
   "set-position": (cwd, args) => {
     const parsed = parseArgs(args);
     const name = requirePositional(parsed, 0, "name");
@@ -188,8 +173,6 @@ export const roadmapMutatingCommands: ReadonlySet<string> = new Set([
   "remove-sprint",
   "move",
   "set-status",
-  "set-sprint-status",
-  "set-active",
   "set-position",
 ]);
 
@@ -204,8 +187,6 @@ export const commandDescriptions: Record<string, string> = {
   "remove-sprint": "Remove an empty sprint",
   move: "Move an issue to a sprint, or back to the backlog with --backlog",
   "set-status": "Set an issue's status",
-  "set-sprint-status": "Set a sprint's status",
-  "set-active": "Mark a sprint as the active one",
   "set-position": "Set a sprint's advisory sort position",
   spec: "Create or return an issue's spec file path",
   "log-issue": "Append a progress log entry to an issue",

@@ -21,7 +21,6 @@ describe("sprintsStore", () => {
   const sample: Sprint = {
     name: "foundation",
     position: 10,
-    status: "planned",
     goal: "build the mechanical layer",
     notes: "",
   };
@@ -45,5 +44,12 @@ describe("sprintsStore", () => {
   it("writes an empty array as []", () => {
     writeSprints(cwd, []);
     expect(readSprints(cwd)).toEqual([]);
+  });
+
+  it("strips a legacy stored `status` field on read (status is derived, never stored)", () => {
+    const legacy = [{ ...sample, status: "active" }];
+    fs.writeFileSync(sprintsFilePath(cwd), `${JSON.stringify(legacy, null, 2)}\n`);
+    expect(readSprints(cwd)).toEqual([sample]);
+    expect(readSprints(cwd)[0]).not.toHaveProperty("status");
   });
 });

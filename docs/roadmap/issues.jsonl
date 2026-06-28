@@ -66,3 +66,4 @@
 {"id":66,"title":"kanban view: board does not scroll to keep the selected issue visible when navigating with arrow keys","status":"done","sprint":"kanban-viewer-polish","createdAt":"2026-06-26T17:59:46.122Z","updatedAt":"2026-06-26T21:18:36.994Z"}
 {"id":67,"title":"kanban view sprint-selector: does not show sprint status (active/planned/done) — user must enter each sprint to know its state","status":"done","sprint":"kanban-viewer-polish","createdAt":"2026-06-26T17:59:46.687Z","updatedAt":"2026-06-26T18:06:16.749Z"}
 {"id":68,"title":"Add integration test for view() entry point: verify buildPlan({ done: true }) includes done-column issues","status":"done","sprint":"","createdAt":"2026-06-26T20:20:34.468Z","updatedAt":"2026-06-27T16:51:05.227Z"}
+{"id":69,"title":"Derived sprint status + sprint-state board view","status":"doing","sprint":"","createdAt":"2026-06-28T21:14:39.306Z","updatedAt":"2026-06-28T21:14:39.306Z"}

@@ -9,7 +9,10 @@ export function readSprints(cwd: string): Sprint[] {
     return [];
   }
   const raw = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(raw) as Sprint[];
+  const records = JSON.parse(raw) as (Sprint & { status?: unknown })[];
+  // Normalize away any legacy `status` field — status is derived, never stored, so
+  // we strip it on read to keep subsequent writes clean (see domain/sprintStatus.ts).
+  return records.map(({ name, position, goal, notes }) => ({ name, position, goal, notes }));
 }
 
 export function writeSprints(cwd: string, sprints: Sprint[]): void {
