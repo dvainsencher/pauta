@@ -39,6 +39,9 @@ export function computeSprintLayout(rows: number, cols: number): {
   return { maxVisible, columnWidth, cardWidth: columnWidth - 2 };
 }
 
+// The board is always fed a plan built with { done: true } (see buildViewData), so
+// sprint.issues includes done issues — these counts are over the full issue set, matching
+// the derived status. A done-filtered plan would under-count and show a done sprint as 0/0.
 function doneTotal(sprint: SprintGroup): { done: number; total: number } {
   const total = sprint.issues.length;
   const done = sprint.issues.filter((i) => i.status === "done").length;

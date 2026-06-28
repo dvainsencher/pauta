@@ -12,9 +12,6 @@ import { SprintBoard } from "./sprintBoard.js";
 import { moveLeft, moveRight, moveUp, moveDown, clampScroll, type NavState } from "./navigation.js";
 import { CardDetail } from "./cardDetail.js";
 
-// Re-exported for tests that import it from view.js; the implementation now lives in navigation.ts.
-export { clampScroll };
-
 // Enforced total card footprint: border-top + id/status + title + sprint-name + indicators + border-bottom + marginBottom = 7.
 // The Card Box sets height={CARD_HEIGHT - 1} (the 6 bordered rows) plus marginBottom={1}, so the rendered
 // footprint EQUALS CARD_HEIGHT by construction — a layout invariant, not an estimate. Combined with

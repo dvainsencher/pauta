@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { moveLeft, moveRight, moveUp, moveDown, type NavState } from "./navigation.js";
+import { moveLeft, moveRight, moveUp, moveDown, clampScroll, type NavState } from "./navigation.js";
 
 describe("keyboard navigation", () => {
   const col0: NavState = { colIndex: 0, rowIndex: 0 };
@@ -53,5 +53,26 @@ describe("keyboard navigation", () => {
     const next = moveRight(state, [0, 3, 1, 0]);
     expect(next.colIndex).toBe(2);
     expect(next.rowIndex).toBe(0);
+  });
+});
+
+describe("clampScroll", () => {
+  it("returns offset unchanged when rowIndex is within view", () => {
+    expect(clampScroll(0, 1, 3)).toBe(0);
+    expect(clampScroll(2, 3, 3)).toBe(2);
+  });
+
+  it("scrolls down to reveal rowIndex when it is past the bottom of the viewport", () => {
+    expect(clampScroll(0, 3, 2)).toBe(2); // offset shifts so row 3 sits at the bottom
+    expect(clampScroll(0, 5, 3)).toBe(3);
+  });
+
+  it("scrolls up to reveal rowIndex when it is above the top of the viewport", () => {
+    expect(clampScroll(3, 1, 2)).toBe(1); // offset jumps up to row 1
+    expect(clampScroll(5, 2, 3)).toBe(2);
+  });
+
+  it("clamps to 0 when rowIndex is 0", () => {
+    expect(clampScroll(0, 0, 5)).toBe(0);
   });
 });

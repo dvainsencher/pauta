@@ -87,9 +87,9 @@ describe("SprintBoard", () => {
     const lines = (lastFrame() ?? "").split("\n");
     expect(lines.length).toBeLessThanOrEqual(24);
     for (const line of lines) {
-      // strip ANSI for width measurement
+      // strip ANSI colour codes (ESC + "[..m") so we measure visual width
       // eslint-disable-next-line no-control-regex
-      expect(line.replace(/\[[0-9;]*m/g, "").length).toBeLessThanOrEqual(80);
+      expect(line.replace(/\x1b\[[0-9;]*m/g, "").length).toBeLessThanOrEqual(80);
     }
   });
 
