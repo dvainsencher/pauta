@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
 import { render } from "ink-testing-library";
+import { act } from "react";
 import React from "react";
 import { CardDetail } from "./cardDetail.js";
 import type { IssueView } from "../../reader/plan.js";
 import type { ProgressEntry } from "../../domain/types.js";
+
+beforeAll(() => { (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true; });
 
 function makeIssue(overrides: Partial<IssueView> & { id: number }): IssueView {
   return {
@@ -53,5 +56,61 @@ describe("CardDetail", () => {
     const issue = makeIssue({ id: 1 });
     const { lastFrame } = render(<CardDetail issue={issue} spec={null} log={[]} onClose={() => {}} />);
     expect(lastFrame() ?? "").toMatch(/esc|close/i);
+  });
+
+  it("starts with spec visible from the top (first line, not bottom)", () => {
+    const issue = makeIssue({ id: 1 });
+    // 30-line spec exceeds the default 24-row terminal minus fixed chrome
+    const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
+    const { lastFrame } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+    const frame = lastFrame() ?? "";
+    expect(frame).toContain("Line 1");
+    expect(frame).not.toContain("Line 30");
+  });
+
+  it("scrolls down on ↓ arrow key", () => {
+    const issue = makeIssue({ id: 1 });
+    const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
+    const { lastFrame, stdin } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+
+    // Before: spec header visible, Line 30 not visible
+    expect(lastFrame() ?? "").toContain("── spec ──");
+    expect(lastFrame() ?? "").not.toContain("Line 30");
+
+    // Scroll all the way down
+    for (let i = 0; i < 25; i++) act(() => stdin.write("\x1B[B"));
+
+    const after = lastFrame() ?? "";
+    expect(after).toContain("Line 30");
+    expect(after).not.toContain("── spec ──");
+  });
+
+  it("scrolls back up on ↑ arrow key after scrolling down", () => {
+    const issue = makeIssue({ id: 1 });
+    const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
+    const { lastFrame, stdin } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+
+    // Scroll down to bottom
+    for (let i = 0; i < 25; i++) act(() => stdin.write("\x1B[B"));
+    expect(lastFrame() ?? "").not.toContain("── spec ──");
+
+    // Scroll back up to top
+    for (let i = 0; i < 25; i++) act(() => stdin.write("\x1B[A"));
+    expect(lastFrame() ?? "").toContain("── spec ──");
+  });
+
+  it("shows ↓ more indicator when content overflows below", () => {
+    const issue = makeIssue({ id: 1 });
+    const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
+    const { lastFrame } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+    expect(lastFrame() ?? "").toMatch(/↓.*more/);
+  });
+
+  it("shows ↑ more indicator when scrolled past content above", () => {
+    const issue = makeIssue({ id: 1 });
+    const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
+    const { lastFrame, stdin } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+    act(() => stdin.write("\x1B[B"));
+    expect(lastFrame() ?? "").toMatch(/↑.*more/);
   });
 });
