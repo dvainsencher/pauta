@@ -9,8 +9,9 @@ const ENTRY_COLORS: Record<string, string> = {
   pending: "yellow",
 };
 
-// Rows consumed by the fixed chrome: border(2) + paddingY(2) + title+margin(2) + status+margin(2) + footer+margin(2).
-const FIXED_ROWS = 10;
+// Rows consumed by the fixed chrome: border(2) + paddingY(2) + title+margin(2) + status+margin(2) + footer+margin(2)
+// plus 2 reserved for the ↑/↓ indicator lines that appear when content overflows (both may show simultaneously).
+const FIXED_ROWS = 12;
 
 interface ContentLine {
   text: string;

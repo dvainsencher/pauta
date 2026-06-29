@@ -106,6 +106,32 @@ describe("CardDetail", () => {
     expect(lastFrame() ?? "").toMatch(/↓.*more/);
   });
 
+  it("shows no scroll indicators when content fits within viewport", () => {
+    const issue = makeIssue({ id: 1 });
+    const spec = "Short spec\nLine 2";
+    const { lastFrame } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+    const frame = lastFrame() ?? "";
+    expect(frame).not.toMatch(/↑.*more/);
+    expect(frame).not.toMatch(/↓.*more/);
+  });
+
+  it("clamps scroll offset at boundaries (no overscroll)", () => {
+    const issue = makeIssue({ id: 1 });
+    const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
+    const { lastFrame, stdin } = render(<CardDetail issue={issue} spec={spec} log={[]} onClose={() => {}} />);
+
+    // Scroll way past the bottom — should clamp
+    for (let i = 0; i < 100; i++) act(() => stdin.write("\x1B[B"));
+    const atBottom = lastFrame() ?? "";
+    expect(atBottom).toContain("Line 30");
+
+    // Scroll way past the top — should clamp
+    for (let i = 0; i < 100; i++) act(() => stdin.write("\x1B[A"));
+    const atTop = lastFrame() ?? "";
+    expect(atTop).toContain("── spec ──");
+    expect(atTop).toContain("Line 1");
+  });
+
   it("shows ↑ more indicator when scrolled past content above", () => {
     const issue = makeIssue({ id: 1 });
     const spec = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join("\n");
